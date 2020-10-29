@@ -1,8 +1,8 @@
-## PROJECT: glitr
-## AUTHOR:  AChafetz | USAID
+## PROJECT: pretty_in_gray40k
+## AUTHOR:  A.Chafetz & T.Essam | USAID
 ## PURPOSE: makeover plots for style guide
 ## DATE:    2020-10-25
-## UPDATED: 2020-10-28
+## UPDATED: 2020-10-29
 
 
 # DEPENDENCIES ------------------------------------------------------------
