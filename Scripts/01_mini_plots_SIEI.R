@@ -10,6 +10,7 @@
   library(tidyverse)
   library(glitr)
   library(here)
+  library(extrafont)
   
   # Where stuff gonna live
   graph <- "Graphics"
@@ -145,24 +146,50 @@
 
 # SMALL MULTIPLES ---------------------------------------------------------
 
-  anc <- anscombe %>% 
-    pivot_longer(cols = everything(),
-              names_to = c(".value", "set"),
-              names_pattern = "(.)(.)") %>% 
-    mutate(set = case_when(
-      set == 1 ~ "Country A",
-      set == 2 ~ "Country B",
-      set == 3 ~ "Country C",
-      set == 4 ~ "Country D"
-    ))
-    
-  ggplot(anc, aes(x = x, y = y, group = set)) +
-    geom_point(shape = 21, size = 4, fill = grey10k) +
-    facet_wrap(~paste0(set, "\n")) +
-    geom_smooth(se = F, colour = grey90k, method = "lm") +
-    si_style_void()+
-    expand_limits(x = 0, y = 0) +
-    labs(x = NULL, y = NULL)
-    
-  ggsave(here(graph, "small_multiples.svg"), device = "svg")  
+  # anc <- anscombe %>% 
+  #   pivot_longer(cols = everything(),
+  #             names_to = c(".value", "set"),
+  #             names_pattern = "(.)(.)") %>% 
+  #   mutate(set = case_when(
+  #     set == 1 ~ "Country A",
+  #     set == 2 ~ "Country B",
+  #     set == 3 ~ "Country C",
+  #     set == 4 ~ "Country D"
+  #   ))
+  #   
+  # ggplot(anc, aes(x = x, y = y, group = set)) +
+  #   geom_point(shape = 21, size = 4, fill = grey10k) +
+  #   facet_wrap(~paste0(set, "\n")) +
+  #   geom_smooth(se = F, colour = grey90k, method = "lm") +
+  #   si_style_void()+
+  #   expand_limits(x = 0, y = 0) +
+  #   labs(x = NULL, y = NULL)
+  #   
+  # ggsave(here(graph, "small_multiples.svg"), device = "svg")  
+  # 
+  df_tx <- cascade %>% 
+    filter(indicator == "TX_NEW",
+          period_type == "results") 
+  
+  sel_partner <- df_tx %>% 
+    count(primepartner, wt = value) %>% 
+    slice_max(n = 3, order_by = n) %>% 
+    pull(primepartner)
+
+  df_tx <- df_tx %>% 
+    filter(primepartner %in% sel_partner)
+  
+  df_tx %>% 
+    ggplot(aes(period, value)) +
+    geom_col() +
+    geom_hline(yintercept = 0) +
+    facet_grid(primepartner~.) +
+    labs(x = NULL, y = NULL) +
+    si_style_nolines() +
+    theme(axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          strip.text = element_blank())
+
+  ggsave(here(graph, "small_multiples.svg"), device = "svg", scale = sizing) 
+  
   
