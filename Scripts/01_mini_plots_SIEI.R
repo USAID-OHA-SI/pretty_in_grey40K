@@ -166,3 +166,17 @@
     
   ggsave(here(graph, "small_multiples.svg"), device = "svg")  
   
+
+# HEX VALUE CONVERSION TO RGB FOR PALETTE ---------------------------------
+
+  library(viridis)
+  library(scales)
+  
+  colors <- c("#2057a7", "#1e87a5", "#c43d4d", "#f2bc40", "#8980cb", "#287c6f", "#e07653")
+  
+  purrr::map(colors, ~col2rgb(.))
+  
+  # Genrate hex values for viridis palette
+  show_col(viridis_pal()(10))
+  
+  
