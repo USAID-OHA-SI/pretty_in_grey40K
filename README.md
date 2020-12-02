@@ -4,6 +4,7 @@ Enjoy.
 
 Use color responsibly.
 
+![SIEI recommended continuous palettes](https://user-images.githubusercontent.com/5873344/100791042-b3fb0800-33e6-11eb-8d8a-757e4cf8a38d.png)
 
 ---
 
