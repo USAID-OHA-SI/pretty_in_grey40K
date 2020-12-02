@@ -13,7 +13,7 @@
   library(patchwork)
   library(purrr)
   
-  pals <- c("royals", "old_roses", "moody_blues", "burnt_siennas", 
+  pals <- c("denims", "old_roses", "moody_blues", "burnt_siennas", 
             "scooters", "golden_sands", "genoas")
 
   graphics <- "Graphics"
@@ -44,7 +44,7 @@
     geom_text(aes(label = hex, colour = text_color, size = 10)) +
     scale_fill_identity() +
     scale_color_identity() +
-    facet_wrap(~str_to_upper(pal_name), ncol = 1, scales = "free_y") +
+    facet_wrap(~(fct_reorder(str_to_upper(pal_name), row)), ncol = 1, scales = "free_y") +
     theme_void() +
     theme(strip.text = element_text(face="bold", size = 12, hjust = 0.05),
           legend.position = "none")
