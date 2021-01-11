@@ -180,7 +180,6 @@
   
   # Genrate hex values for viridis palette
   show_col(viridis_pal()(10))
-=======
   # anc <- anscombe %>% 
   #   pivot_longer(cols = everything(),
   #             names_to = c(".value", "set"),
@@ -226,6 +225,5 @@
           strip.text = element_blank())
 
   ggsave(here(graph, "small_multiples.svg"), device = "svg", scale = sizing) 
->>>>>>> 1c2ba60f2916ffeaa94e0562c91c380098c7bc87
   
   
