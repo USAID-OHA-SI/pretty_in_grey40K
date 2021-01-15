@@ -1,0 +1,693 @@
+---
+title: "Charts for Common Data Relationships"
+author: "Tim Essam | Aaron Chafetz"
+date: "1/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, out.width = '100%')
+
+pub_images <- "public_images"
+
+# Set up caption object
+caption <- paste0("Source: Testing data from glitr package | Created on: ", Sys.Date())
+```
+
+### How to use ggplot2 and glitr to create clean visualizations
+
+The following tutorial provides a crash course for using the SIEI recommended chart types and color palettes. The examples correspond to those outlined in the [Data Viz Cheat Sheet](https://user-images.githubusercontent.com/5873344/100870163-2661fb80-346c-11eb-8114-bf677f8cc6fb.png). All plots are created using the `ggplot2`, `glitr` and a few helper packages such as `scales`, `ggrepel` and `sf`. To complete this tutorial, you will need to download and install all of these packages.
+
+#### Wait, What is `glitr`?
+
+`glitr` is a hand-crafted SI R graphics package that allows a user to create standardized plots with a common look and feel (think Baldwin Brothers). The package includes the SIEI recommended color schemes and chart formatting options to minimize chart junk. Detailed examples on how to use functions included in the `glitr` package can be found in the [glitr cookbook](https://github.com/USAID-OHA-SI/glitr/blob/master).
+
+#### Key Performance Indicators (KPIs)
+
+KPIs are useful for summarizing a metric or series of metrics. KPI graphics should be simple and easy to interpret. The inclusion of arrows can help indicate the direction of change.
+
+```{r hts}
+  library(tidyverse)
+  library(scales)
+  library(glitr)
+  library(here)
+  library(patchwork)
+
+  # Munge the data to get KPIs in a data frame
+  # Add thousands (K) or millions (M) label to number depending on size
+    kpi <- 
+      hts %>% 
+      filter(period == "FY50", period_type == "cumulative") %>% 
+      group_by(indicator) %>% 
+      summarise(total = round(sum(value, na.rm = TRUE)/1000)) %>% 
+      ungroup() %>% 
+      spread(indicator, total) %>% 
+      mutate(Yield = (HTS_TST_POS / HTS_TST)) %>% 
+      pivot_longer(everything(), 
+                   values_to = "value", 
+                   names_to = "indicator") %>% 
+      mutate(row_order = 0,
+             label = case_when(
+               indicator %in% c("HTS_TST", "HTS_TST_POS") ~ paste0(value, " K"),
+               TRUE ~ percent(value, 0.01)
+               )
+             )
+    
+  # Now create a geom_text plot with the KPIs. We use the facet strip position to not the indicator type.
+    p <- ggplot(kpi, aes(y = row_order, x = indicator, colour = indicator)) +
+      # Toggle chunk below if you want a shape to appear behind the text
+      #geom_point(aes(fill = indicator), shape = 22, size = 50, alpha = 0.25) + 
+      geom_text(aes(label = label), size = 10) +
+      facet_wrap(~indicator, nrow = 1, strip.position = "bottom", scales = "free") +
+      si_style_void() +
+      scale_color_si(palette = "denim") +
+      scale_fill_si(palette = "denim") +
+      theme(legend.position = "none",
+            strip.text = element_text(size = 12, hjust = 0.5)) 
+    
+  # When saving, compress the dimensions to only retain the geom and the facet label.
+  # In many cases, making KPI's may be easier in Google Presentation/PowerPoint.
+    si_save(file.path(pub_images, "kpi"), plot = p, width = 8, height = 0.75)
+    
+  # TODO: Investigate the use of gt
+    # kpi %>% select(indicator, label) %>% pivot_wider(names_from = label, values_from = indicator) %>% gt::gt() %>% gt::tab_options(
+    # row.striping.include_table_body = FALSE,
+    # table.border.top.color = "white",
+    # heading.border.bottom.color = "white",
+    # row_group.border.bottom.color = "white",
+    # row_group.border.top.color = "white")
+```
+
+The resulting plot is shown below. If exported as a .pdf or .svg, the figure can be further edited in Adobe Illustrator. If dealing with a limited number of indicators, it is often easier to create KPIs directly in the presentation software using a large font and SIEI colors.
+
+```{r kpi_exmple, echo = FALSE, out.width = '100%'}
+  knitr::include_graphics(here("public_images/kpi.png"))  
+```
+
+#### Showing Magnitude (Bar Charts)
+
+Bar graphs are one of the most effective ways of comparing the magnitudes of a metric aross numerous categories. Sorting the bars based on the magnitude (not alphabetically) helps the reader make quick comparisons. Highlighting bars above a given threshold can help distinguish different classes of categories.
+
+When munging the hts data for the bar graph, make use of the `forcats::fct_reorder()` or `tidytext::reorder_within()` functions to help with sorting bars and/or facets. If you try to plot without setting the primepartner as an ordered factor, you will get a plot like the one below.
+
+```{r bar graph}
+
+# Munge the hts data down to testing yields for a given year
+  hts_bar <- 
+    hts %>% 
+      filter(period == "FY50", period_type == "cumulative") %>% 
+      group_by(indicator, primepartner) %>% 
+      summarise(total = sum(value, na.rm = TRUE)) %>% 
+      ungroup() %>% 
+      spread(indicator, total) %>% 
+      mutate(yield = (HTS_TST_POS / HTS_TST)) 
+
+
+  hts_bar %>% 
+    ggplot(aes(x = primepartner, y = yield)) + 
+    coord_flip() + 
+    geom_col() +
+    si_style_xgrid()
+  
+  si_save(here(pub_images, "Unsorted_bar.png"))
+```
+
+Sort the partners variable by yield and then plot as a rotated, sorted bar graph. Notice that we are using the `si_style_xgrid()` option from the `glitr` package to call baked-in formatting.
+
+```{r sorted_bar}
+  hts_bar_sorted <- 
+    hts_bar %>% 
+    mutate(partner_ordered = fct_reorder(primepartner, yield)) 
+  
+  hts_bar_sorted %>% 
+    ggplot(aes(x = partner_ordered, y = yield)) + 
+    coord_flip() + 
+    geom_col() +
+    si_style_xgrid()
+  si_save(here(pub_images, "Sorted_bar.png"))
+```
+
+This plot can be further polished by i) highlighting all partners that have yields higher than 20% ii) touching up the axes labels and iii) adding in a title and caption. If using the graphic in a presentation, adding additional annotation, such as why these two prime partners were such high performers, would be recommended as well.
+
+To highlight the partners that have achieved beyond a given threshold, we create a new variable called color_flag. If the `yield` value is greater than 20%, then we assign the color to be scooter (`#1e87a5`) for those partners. Otherwise, the value is assigned to be grey20k ( `#d1d3d4`). The `scale_fill_identity()` option is used in the ggplot2 call to reference the fill value passed in the aesthetics portion of the code. Finally, we make use of the `scales::percent_format()` function to format that x-axis to a percentage.
+
+```{r sorted_bar improved}
+
+# Match axis label colors to top to performers
+  label_colors <- if_else(sort(hts_bar_sorted$yield, decreasing = FALSE) > 0.2, scooter, 
+                          color_caption)
+
+  hts_bar_sorted %>% 
+    mutate(color_flag = if_else(yield > 0.2, scooter, grey20k)) %>% 
+    ggplot(aes(x = partner_ordered, y = yield, fill = color_flag)) + 
+    coord_flip() + 
+    geom_col() +
+    scale_fill_identity() +
+    scale_y_continuous(labels = percent_format()) +
+    si_style_xgrid() +
+    labs(x = NULL, y = NULL, 
+         title = "BOOTES AND LEO ACHIEVED THE HIGHEST TESTING YIELDS",
+         caption = caption
+         ) +
+    theme(axis.text.y = element_text(colour = label_colors, family = "Source Sans Pro"))
+  
+  si_save(here(pub_images, "bar_chart_example.png"))
+```
+
+```{r}
+# Munge data to get percent achievement
+  hts_bar <- 
+    hts %>% 
+      filter(period == "FY50", period_type == "cumulative") %>% 
+      group_by(indicator, primepartner) %>% 
+      summarise(total = sum(value, na.rm = TRUE)) %>% 
+      ungroup() %>% 
+      spread(indicator, total) 
+```
+
+#### Showing Change Over Time (Time-Series Chart)
+
+Time-series plots are used to show how a metric changes over a fixed period of time - be it in days, months, quarters or years. Annotate major events to help explain large variations or the lack of expected variation. If comparing many sites or categories across time, break the plots into small multiples and use a group average to show over/under performers.
+
+In the example below, we look at how testing volumes varied by the previous five quarters.
+
+```{r line chart,  message=FALSE, warning=FALSE}
+hts_line <- 
+  hts %>% 
+  filter(str_detect(period, "Q")) %>% 
+  group_by(primepartner, indicator, period) %>% 
+  summarise(qtr_totals = sum(value, na.rm = TRUE)) %>% 
+  ungroup()
+  
+# Focus just on Virgo to start. Be sure to pass a grouping variable to the 
+# aes() to get the plot to show up.
+  hts_line %>% 
+    filter(primepartner == "Virgo", indicator == "HTS_TST") %>% 
+    ggplot(aes(x = period, y = qtr_totals, group = primepartner)) +
+    geom_line() +
+    si_style_ygrid()
+  si_save(here(pub_images, "time_series_1_example.png"))
+
+```
+
+The chart above is a good start. It is clean and clearly shows the decline in testing for Virgo. Adding in a few geoms can help this plot pop out a bit more. Let's first fill the area below the line and add in some dots to help the quarters stand out.
+
+```{r}
+  hts_line %>% 
+    filter(primepartner == "Virgo", indicator == "HTS_TST") %>% 
+    ggplot(aes(x = period, y = qtr_totals, group = primepartner)) +
+    geom_line() +
+    geom_area(fill = grey10k, alpha = .75) +
+    geom_point(shape = 21, fill = "white", size = 3) +
+    si_style_ygrid() +
+    labs(x = NULL, y = NULL, title = "TESTING VOLUME DOWN IN FY50Q1 FOR VIRGO",
+         caption = caption)
+  si_save(here(pub_images, "time_series_2_example.png"))
+```
+
+##### Encoding with Size and Color
+
+If you wanted to take this chart a step further, you could encode each dot with a color ramp that is mapped to the testing volume range and each dot size to the testing volume. To accomplish this, we can pass a `fill` and `size` aesthetic to the `geom_point` function. We then use the `scale_fill_si()` function and apply the `genoas` palette. The palette direction is reversed so that darker colors correspond to higher values. To show a broader range of values, the filter is expanded to two additional prime partners. A `facet_wrap` call is also included to create small multiples --- one graph for each prime partner placed on fixed scales.
+
+```{r}
+  hts_line %>% 
+    filter(primepartner %in% c("Virgo", "Ursa Major", "Capricornus"), 
+           indicator == "HTS_TST") %>% 
+    ggplot(aes(x = period, y = qtr_totals, group = primepartner)) +
+    geom_line() +
+    geom_area(fill = grey10k, alpha = .75) +
+    geom_point(aes(fill = qtr_totals, size = qtr_totals), 
+               shape = 21, color = "white", stroke = 1) +
+    scale_fill_si(palette = "genoas", discrete = FALSE, reverse = TRUE) +
+    facet_wrap(~primepartner) +
+    si_style_ygrid() +
+    scale_size_area() +
+    scale_x_discrete(labels = c("Q1\nFY49", "Q2\n", "Q3\n", "Q4\n", "Q1\nFY50"))+
+    labs(x = NULL, y = NULL, title = "TESTING VOLUMES DOWN IN FY50Q1",
+         caption = caption) +
+    theme(legend.position = "none")
+  si_save(here(pub_images, "time_series_3_example.png"))
+```
+
+##### Small Multiples and Comparison Points
+
+To see a series of charts for all the partners, we use the facet_wrap option. Calculating the average performance across partners by period yields a valuable comparison metric. We can then organize the partners from over to under performing. To highlight data points above/below average, we use a conditional fill on dots placed on the line graph. Negative space is created by shading the stroke around each dot with a white fill. A light grade shaded area shows the magnitude of deviation from the mean. Finally, we clean up the x-axis labels using a manual scale with line breaks to align fiscal quarters.
+
+```{r}
+hts_line_order <- 
+  hts_line %>% 
+  group_by(period, indicator) %>% 
+  mutate(period_ave = mean(qtr_totals, na.rm = TRUE),
+         deviation = qtr_totals - period_ave) %>% 
+  ungroup() %>% 
+  mutate(partner_order = fct_reorder(primepartner, deviation, .fun = mean, .desc = TRUE),
+         dot_color = if_else(deviation >= 0, scooter, old_rose))
+
+
+  hts_line_order %>% 
+    filter(indicator == "HTS_TST", !primepartner %in% c("Dedup", "Leo")) %>% 
+    ggplot(aes(x = period, y = qtr_totals, group = primepartner)) +
+    geom_line(aes(y = period_ave), linetype = "dashed", color = grey50k) +
+    geom_line(color = grey60k) +
+    geom_ribbon(aes(ymin = qtr_totals, ymax = period_ave), alpha = 0.33, fill = grey20k) +
+    geom_point(aes(fill = dot_color), shape = 21, size = 2, colour = "white") +
+    scale_fill_identity() +
+    facet_wrap(~partner_order) +
+    scale_x_discrete(labels = c("Q1\nFY49", "Q2\n", "Q3\n", "Q4\n", "Q1\nFY50"))+
+    scale_y_continuous(labels = comma) +
+    si_style_ygrid() +
+    labs(x = NULL, y = NULL, title = "TESTING VOLUMES ARE TRENDING DOWN",
+         subtitle = "Points in red (green) indicator performance below (above) the quarterly mean (dotted line).",
+         caption = caption) +
+    theme(axis.text = element_text(size = 8))
+    si_save(here(pub_images, "time_series_4_example.png"))
+  
+```
+
+#### Ranking
+
+A slope plot or connected line graph is an effective way to show how metric for a category has changed across time. These types of graphs tend to work best when the change is dramatic or categories are easily sorted. In the example below, we will look at how testing results differed from FY49Q1 to FY50Q1. The main question we want to investigate is whether partners were performing better or worse in FY50Q1 compared to Q1 of the previous year.
+
+```{r}
+# Munge data to show only annual targets for HTS_TST
+# Generate percentage change and a period color variable
+  hts_slope <- 
+    hts %>% 
+    filter(indicator == "HTS_TST", 
+           str_detect(period, "Q1"),
+           period_type == "results", 
+           !primepartner %in% c("Dedup", "Leo")
+           ) %>% 
+    group_by(primepartner, period) %>%
+    summarise(total_tgts = sum(value, na.rm = TRUE)) %>% 
+    mutate(percent_change = (total_tgts / lag(total_tgts, order_by = period) - 1),
+           percent_change_allpds = percent_change,
+           period_color = ifelse(period == "FY49Q1", denim, scooter), 
+           partner_label = ifelse(period == "FY50Q1", primepartner, NA)
+           ) %>% 
+    fill(., percent_change_allpds, .direction = "up") %>% 
+    ungroup() 
+
+    
+  hts_slope %>% 
+    ggplot(aes(x = period, y = total_tgts, group = primepartner)) +
+    geom_line() +
+    si_style_xline()
+  si_save(here(pub_images, "slope_plot_1.png"))
+   
+```
+
+While the graph above shows the decline for most partners, it is hard to see if any partners had better performance. If we look at the munged data, see that Ophiuchus actually had tested more individuals in FY50Q1. We can use color to help draw this anomaly out. The data is also filtered into two groups so that the observations that have a positive percent change are shown on the very top. We finish by expanding the x-scale with the `expand` argument in the `scale_x_discrete` function. Expand can be used to add padding around the data to ensure they are placed some distance away from the axes.
+
+```{r}
+  hts_slope %>% 
+    ggplot(aes(x = period, y = total_tgts, group = primepartner,
+               color = if_else(percent_change_allpds > 0, genoa, grey20k),
+               fill = if_else(percent_change_allpds > 0, genoa, grey20k))) +
+    geom_line(data = . %>% filter(percent_change_allpds < 0)) +
+    geom_line(data = . %>% filter(percent_change_allpds >= 0)) +
+    geom_point(shape = 21, size = 3) +
+    scale_fill_identity() +
+    scale_color_identity() +
+    si_style_nolines() +
+    scale_x_discrete(expand = c(0.05, 0.05)) +
+    labs(x = NULL, y = NULL,
+         title = "OPHINUCHUS WAS THE ONLY PARTNER TO SEE HIGHER TESTING VOLUMES IN FY50Q1",
+         caption = caption)
+  si_save(here(pub_images, "slope_plot_2.png"))
+   
+```
+
+This plot could be further polished by adding in some annotation and calling out the partners with the largest percentage changes. Another option would be to group the partners by the degree of annual change in testing. The `cut_interval` command will create a given number of groups with equal ranges. Below, `n` is set to three to group partners into large, medium and small clusters.
+
+```{r}
+  hts_slope %>% 
+    mutate(cut_groups_pct = cut_interval(percent_change_allpds, n = 3),
+           cut_groups_pct = factor(cut_groups_pct, 
+                                   labels = c("Large", "Medium", "Small"))) %>% 
+    ggplot(aes(x = period, y = total_tgts, group = primepartner,
+               color = if_else(percent_change_allpds > 0, genoa, grey20k),
+               fill = if_else(percent_change_allpds > 0, genoa, grey20k))) +
+    geom_line(data = . %>% filter(percent_change_allpds < 0)) +
+    geom_line(data = . %>% filter(percent_change_allpds >= 0)) +
+    geom_point(shape = 21, size = 3) +
+    facet_wrap(~cut_groups_pct) +
+    scale_fill_identity() +
+    scale_color_identity() +
+    si_style_xline() +
+    scale_x_discrete(expand = c(0.05, 0.05)) +
+    labs(x = NULL, y = NULL,
+         title = "OPHINUCHUS WAS THE ONLY PARTNER TO SEE HIGHER TESTING VOLUMES IN FY50Q1",
+         subtitle = "Facets organized by degree of change",
+         caption = caption)
+  si_save(here(pub_images, "slope_plot_3.png"))
+```
+
+##### Integrated Labels for Clarity
+
+The previous plots are great for highlighting the performance of a single partner. But these plots fail to tell us which partners had the largest or smallest changes. To accomplish this, we can encode these changes with colors and then add integrated (direct) labels to the graphic. We make use of the `ggrepel` package to directly label each point. In doing this, the y-axis can be dropped and the
+
+```{r}
+  colors_cat <- c(denim, scooter, burnt_sienna)
+
+ slope_plot <-  hts_slope %>% 
+    mutate(cut_groups_pct = cut_interval(percent_change_allpds, n = 3),
+           cut_groups_pct = factor(cut_groups_pct, 
+                                   labels = c("Large", "Medium", "Small"))) %>% 
+    ggplot(aes(x = period, y = total_tgts, group = primepartner,
+               color = cut_groups_pct,
+               fill = cut_groups_pct)) +
+    # This controls the order in which the lines appear
+    geom_line() +
+    geom_point(shape = 21, size = 3) +
+    # This adds integrated labels to each point
+    ggrepel::geom_text_repel(data = . %>% filter(period == "FY49Q1"), 
+            aes(label = paste0(primepartner, " - ", scales::comma(total_tgts))), 
+            nudge_x = - 0.3,
+            size = 3,
+            force = 1,
+            ) +
+    ggrepel::geom_text_repel(data = . %>% filter(period == "FY50Q1"), 
+            aes(label = paste0(primepartner, " - ", scales::comma(total_tgts))), 
+            nudge_x = 0.3,
+            size = 3, 
+            force = 1,
+            ) +
+    scale_fill_manual(values = colors_cat) +
+    scale_color_manual(values = colors_cat) +
+   scale_y_continuous(expand = c(0.025,0)) +
+    facet_wrap(~cut_groups_pct, ncol = 3) +
+    si_style_xline() +
+    theme(legend.position = "none",
+          axis.text.y = element_blank()) + 
+    labs(x = NULL, y = NULL,
+         title = "CORVUS, AURIGA AND VIRGO HAD THE LARGEST QUARTER 1 PERFORMANCE DROPS ACROSS FISCAL YEARS",
+         subtitle = "Facets organized by degree of change. Comparison based on FY49Q1 and FY50Q1 testing results.",
+         caption = caption)
+
+  # save image and rescale to fit
+  si_save(here(pub_images, "slope_plot_labeled"), plot = slope_plot, scale = 1.5)
+  
+```
+
+```{r slope plot labeled, echo = FALSE, out.width = '100%'}
+  knitr::include_graphics(here("public_images/slope_plot_labeled.png"))  
+```
+
+As a final step, this plot could benefit from some annotation summarizing why these declines occurred. It may also be useful to add in a note on which partner had the largest decline. This may also help orient the reader on how to interpret the plot.
+
+#### Deviation
+
+Deviation charts excel at showing how near or far a metric is from a fixed point. They are often use to show how a metric deviations from a point across members of group. For this next example, we will look at how partner performance in terms of target achievement diverged from the mean achievement overall. To create this plot, we will first calculate partner achievement as a percent of targets, overall partner achievement, and then take the difference of the two to calculate our deviation metric.
+
+```{r deviation}
+hts_dev <- 
+  hts %>% 
+  filter(indicator == "HTS_TST", period == "FY49", period_type != "results") %>% 
+  group_by(primepartner, period_type, indicator) %>% 
+  summarise(partner_totals = sum(value)) %>% 
+  ungroup()  
+
+# Spread the data to make the acheivement calculations a bit easier
+ hts_dev_wide <- 
+   hts_dev %>% 
+   pivot_wider(names_from = period_type, values_from = partner_totals) %>% 
+   mutate(achievement = cumulative / targets) %>% 
+   group_by(indicator) %>% 
+   mutate(annual_results = sum(cumulative), 
+          annual_targets = sum(targets), 
+          annual_achievement = annual_results / annual_targets, 
+          deviation = achievement - annual_achievement,
+          partner_order = fct_reorder(
+            paste0(primepartner, " ", "(", comma(cumulative), "/", comma(targets), ")"), deviation)
+          ) %>% 
+   # Remove dedups
+   filter(primepartner != "Dedup")
+ 
+ glimpse(hts_dev_wide)
+```
+
+##### Flagging Partners
+
+With the main data munging complete, we turn our attention to creating variables we can use in our deviation plot. First, we generate a simple deviation plot in black and white to get a sense of what the over/under-achievement distribution looks like.
+
+```{r deviation plot 1}
+  hts_dev_wide %>% 
+    ggplot(aes(x = deviation, y = partner_order)) +
+    geom_col() +
+    si_style_xgrid()
+  si_save(here(pub_images, "deviation_plot_1.png"))
+```
+
+The next step is to encode partners falling short of the overall achievement average with a different color. Two vertical lines are added at the zero value of the x-axis. This help anchor the deviating bars. Finally, the x-axis is changed to a percentage.
+
+```{r deviation plot 2}
+
+ dev_plot <- 
+   hts_dev_wide %>% 
+   mutate(bar_color = if_else(deviation <= 0, old_rose, scooter)) %>% 
+    ggplot(aes(x = deviation, y = partner_order)) +
+    geom_col(aes(fill = bar_color)) +
+    geom_vline(xintercept = 0, size = 2, colour = grey10k) +
+     geom_vline(xintercept = 0, size = 1, colour = grey90k) +
+      scale_fill_identity() +
+    si_style_xgrid() +
+   scale_x_continuous(labels = percent) +
+   labs(x = "Achievement share deviation from overall average (115% above targets)", 
+        y = NULL, 
+        title = "VIRGO AND SERPENS WERE THE HIGHEST TESTING PARTNERS AS A SHARE OF RESULTS TO TARGETS",
+        subtitle = "Green (red) depicts partners above (below) the acheivement average.")
+ 
+   si_save(here(pub_images, "deviation_plot_2.png"), plot = dev_plot, scale = 1.25)
+```
+
+```{r deviation plot labeled, echo = FALSE, out.width = '100%'}
+  knitr::include_graphics(here("public_images/deviation_plot_2.png"))  
+```
+
+#### Target Achievement Bar Graph
+
+Sometimes we want to show whether or not a partner has achieve their targets for a given period of time and indicator. Rather than cram all this information into a single graphic, we can use a combination of text, filled circles and bar graphs to show levels and achievement status in a single graphic.
+
+We start with a bar graph that summarizes achievement. An effective method for showing this type of relationship is to use a percent achievement bar graph with negative space to highlight a threshold. We will make use of the `hts_dev_wide` data.frame to create this plot. In doing so, we will create a base layer of a bar chart that stops at 100%. We then fill this space in with light grey (grey10k). Next, we overlay the achievement metric and reinforce the 100% threshold by inserting a white vertical line at 100%. This vertical line is placed on top of the achievement bars to show a clear threshold. The combination of the white negative space the light gray form a natural threshold without being distracting.
+
+```{r}
+
+# Create achievement bar graph with negative space highlighting threshold
+# Incorporate text geom to display percent achievement and color bars for partners
+# reaching 100% or higher
+  hts_ach <- 
+    hts_dev_wide %>% 
+    ggplot(aes(x = achievement, y = fct_reorder(primepartner, achievement))) +
+    geom_col(aes(x = 1), fill = grey10k) +
+    geom_col(aes(fill = if_else(achievement > 1, genoa, color_caption))) +
+    geom_vline(xintercept = 1, size = 1.5, colour = "white") +
+    geom_text(aes(x = -.25, label = percent(achievement, accuracy = 2), 
+              color = if_else(achievement > 1, genoa, color_caption)), 
+              hjust = 0.5,
+              fontface = "bold") +
+    si_style_nolines() +
+    scale_x_continuous(position = "top") +
+    theme(axis.text.x =  element_blank(),
+          axis.text.y = element_blank(),
+          axis.title.y = element_blank(),
+          axis.title.x = element_text(hjust = .1)) +
+    #scale_x_continuous(labels = percent) +
+    scale_fill_identity() +
+    scale_color_identity() +
+    labs(y = NULL) 
+ si_save(here(pub_images, "ach_bar_rhs.png"), plot = hts_ach)
+
+```
+
+Next, we create a basic geom_point graph that takes a filled value when a partner has reached 100% achievement or higher. A new `Targets Achieved` variable is created as a constant. This is a placeholder to align the plot. We strip all formatting except the x-axis title. This is moved to the top.
+
+```{r}
+  
+# Create geom_point plot that shows whether or not a partner has achieved targets
+  hts_tgt_achieved <- 
+    hts_dev_wide %>% 
+    mutate(achieved = if_else(achievement > 1, genoa, grey10k),
+            `Targets Achieved` = 1) %>% 
+    ggplot(aes(x = `Targets Achieved`, 
+               y = fct_reorder(primepartner, achievement), 
+               fill = achieved)) +
+    geom_point(shape = 21, size = 4) +
+    scale_fill_identity() +
+    si_style_nolines() + 
+    scale_x_discrete(position = "top") +
+    theme(axis.text.y =  element_blank(),
+          axis.title.y = element_blank())
+  hts_tgt_achieved
+```
+
+```{r}
+ 
+# Create an object of sorted partner achievement where colors indicate a threshold
+# This will be used to fill in the axis labels with different colors
+  ach_color <- if_else(sort(hts_dev_wide$achievement, decreasing = FALSE) > 1, 
+                     genoa, color_title)
+
+  hts_gap_table <-
+        hts_dev_wide %>% 
+    mutate(achieved = if_else(achievement > 1, genoa, color_title),
+           `Deficit/Surplus` = 1) %>% 
+    ggplot(aes(x = `Deficit/Surplus`, 
+               y = fct_reorder(primepartner, achievement)
+               )
+           ) + 
+    geom_text(aes(x = `Deficit/Surplus`,
+                  label = paste0(comma(cumulative - targets)),
+                  color = achieved)
+              ) + 
+    scale_color_identity() + 
+    si_style_nolines() + 
+    scale_x_discrete(position = "top") + 
+    theme(axis.text.y =  element_blank(), 
+          axis.title.y = element_blank()
+          ) 
+  
+  
+  
+  hts_ach_table <-  
+    hts_dev_wide %>% 
+    mutate(achieved = if_else(achievement > 1, genoa, color_title),
+            `Results / Targets` = 1) %>% 
+    ggplot(aes(x = `Results / Targets`, 
+               y = fct_reorder(primepartner, achievement), 
+               fill = grey70k)) +
+    geom_text(aes(label = paste0(comma(cumulative), " / ", comma(targets)), 
+                  color = achieved)) +
+    scale_color_identity() +
+    si_style_nolines() +
+    scale_x_discrete(position = "top") +
+    theme(axis.title.y = element_blank(),
+            axis.text.y = element_text(colour = ach_color, 
+                                       family = "Source Sans Pro SemiBold")
+          )
+  hts_ach_table + hts_gap_table
+
+```
+
+With all of the pieces in place, we use the `patchwork` package to append the plots together. We stretch the margins of the 1st and 3rd plot panel to allow the plots to fit.
+
+```{r}
+
+# Put it all together with patchwork
+  ach_table_plot <- hts_ach_table + hts_gap_table + hts_tgt_achieved + hts_ach + 
+    plot_layout(widths = c(2, 1, 1, 4)) +
+    plot_annotation(caption = caption,
+         title = "SEVEN OF TWELVE PARTNERS ACHIEVED HTS TARGETS")
+
+  si_save(here(pub_images, "ach_table_plot"), plot = ach_table_plot)  
+```
+
+```{r achievement table, echo = FALSE, out.width = '100%'}
+  knitr::include_graphics(here("public_images/ach_table_plot.png"))  
+```
+
+#### Correlation (Scatter Plot)
+
+A scatter plot is useful for when you would like to compare a potential relationship between two variables. Marks can be encoded by size and/or color to represent a third variable. For this example, we will consider the following question: How correlated are testing targets to results? We will also consider this question across testing modalities. When creating a scatterplot you will need to organize your data so that there are separate columns for the x and y variables (cumulative and targets).
+
+```{r}
+library(moderndive)
+hts_corr <- 
+  hts %>% 
+  filter(period == "FY49", indicator == "HTS_TST") %>% 
+  pivot_wider(names_from = period_type, values_from = value) 
+
+# Check for missing values in cumulative or targets
+# Filter out Emergency Ward and Post ANC1
+  hts_corr %>% 
+    group_by(modality) %>% 
+    summarise(flag_c = sum(is.na(cumulative) / sum(n())),
+              flag_t = sum(is.na(targets) / sum(n()))) 
+
+  overall_corr <- 
+    hts_corr %>% 
+    filter(primepartner != "Dedup") %>% 
+    group_by(indicator) %>% 
+    get_correlation(cumulative ~ targets, na.rm = TRUE)
+
+  modality_corr <- 
+    hts_corr %>% 
+    filter(primepartner != "Dedup") %>% 
+    filter(!modality %in% c("Emergency Ward", "Post ANC1")) %>% 
+    group_by(modality, indicator) %>% 
+      get_correlation(cumulative ~ targets, na.rm = TRUE)
+  
+  
+# Merge in correlations
+  hts_corr_calc <- 
+    hts_corr %>% 
+    left_join(., overall_corr, by = c("indicator")) %>% 
+    left_join(., modality_corr, by = c("indicator", "modality"))
+
+
+# Create basic scatterplot  
+# Not very informative 
+  hts_corr %>% 
+    ggplot(aes(x = cumulative, y = targets, fill = modality)) +
+    geom_abline(intercept = 1, color = grey20k) +
+    geom_point(shape = 21) +
+    coord_fixed(ratio = 1) +
+    scale_fill_si(palette = "siei_pairs") +
+    si_style()
+  
+```
+
+As you will notice, the scatter plot is not very informative for a couple of reasons. First, most of the observations are stacked in the bottom right corner. Second, the colors are hard to interpret because you have to scan through the legend and then figure out where that color is on the plot. An easier way to show this information is to divide the plot out into small multiples. About the only thing that mildly works in the 45 degree line that shows whether or not cumulative results were near targets (points falling near the line have a 1-to-1 relationship).
+
+##### Blanking our way to success
+
+If you attempt to create a faceted scatter plot of modalities you will notice that the x and y axis limits become a problem quickly. Because each target and cumulative result have vastly different ranges across modalities, it is hard to represent each scatter plot in one graph. To `trick` ggplot2 into creating free, yet custom axes, for each plot we make use of the `geom_blank()`. First, we create an axis_max data frame that contains the unique modalities and maximum range for cumulative results and targets. This is an 11 row data frame with two columns --- `modality` and `max`, the latter representing the axis max.
+
+```{r correlation small multiples}
+#Extract max values for axes
+mod_filter <- c("Emergency Ward", "Post ANC1", "OtherMod",
+                          "Malnutrition", "IndexMod")
+
+axis_max <- hts_corr %>% 
+  filter(!modality %in% mod_filter) %>% group_by(modality) %>% 
+  summarise(max = max(cumulative, targets, na.rm = TRUE)) 
+
+corr_plot <- hts_corr %>% 
+  filter(!modality %in% c("Emergency Ward", "Post ANC1", "OtherMod",
+                          "Malnutrition", "IndexMod")) %>% 
+    ggplot(aes(x = cumulative, y = targets, fill = modality)) +
+    geom_abline(intercept = 1, color = grey20k) +
+    geom_point(shape = 21) +
+    geom_blank(data = axis_max, aes(x = max, y = max)) +
+    facet_wrap(~modality, scales = "free") +
+    scale_fill_si(palette = "category20") +
+    si_style() +
+    theme(legend.position = "none") 
+
+si_save(here(pub_images, "correlation_modality"), plot = corr_plot)
+```
+
+```{r correlation modality, echo = FALSE, out.width = '100%'}
+  knitr::include_graphics(here("public_images/correlation_modality.png"))  
+```
+
+```{r}
+cwalk <- tibble::tribble(
+  ~adm0_a3, ~primepartner,                        ~sovereignt,
+     "AGO", "Sagittarius",                           "Angola",
+     "BWA",      "Corvus",                         "Botswana",
+     "COD",     "Serpens", "Democratic Republic of the Congo",
+     "LSO", "Capricornus",                          "Lesotho",
+     "MDG",       "Virgo",                       "Madagascar",
+     "MLI",       "Libra",                           "Malawi",
+     "MOZ",         "Leo",                       "Mozambique",
+     "NAM",      "Auriga",                          "Namibia",
+     "ZAF",      "Boötes",                     "South Africa",
+     "SWZ",     "Cepheus",                        "Swaziland",
+     "TZA",  "Ursa Major",      "United Republic of Tanzania",
+     "ZMB",   "Ophiuchus",                           "Zambia",
+     "SWE",    "Eridanus",                         "Zimbabwe"
+  )
+
+
+```
