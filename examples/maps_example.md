@@ -47,7 +47,7 @@ To check the property of an R object or data frame you can use the `str()` funct
 
 `str(hts_geo)`
 
-![Output from of str(hts_geo)](images/hts_geo_str_results.png "Output from of str(hts_geo)")
+![Output from of str(hts_geo)](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/hts_geo_str_results.png "Output from of str(hts_geo)")
 
 In the first line, you will notice that the classes of the object are 'sf' and 'data.frame'. The 'sf' portion of line indicates that the object is a collection of simple features that includes attributes and geometries in the form of a data frame. The major advantage of working with an 'sf' object is that it is compatible with the `tidyverse`. Practically, this means that you can use the pipe `%>%` operator and pass the object through `tidyverse` functions. When plotting, `ggplot2` has a dedicated geom `geom_sf()` to visualize simple features.
 
@@ -82,7 +82,7 @@ In the example below, we walk through how to join attribute data from the `hts` 
    glamr::prinf(hts_geo_dev)
 ```
 
-![Results of joining hts_geo with hts_dev_wide](images/left_join_hts_geo_hts_dev_wide.png "Results of joining hts_geo with hts_dev_wide")
+![Results of joining hts_geo with hts_dev_wide](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/left_join_hts_geo_hts_dev_wide.png "Results of joining hts_geo with hts_dev_wide")
 
 Th output of the join operation shows that the `hts_geo` data merged 13 features (rows) with 11 fields (columns). We can see that partner Leo has NAs for all calculated metrics. Looking at the original `hts` data you can see that Leo in fact only started reporting on testing results in FY50. As the `hts` data is filtered to FY49, it makes sense that Leo has NAs for the calculated metrics. Instead of removing Leo with a filter operation, we leave it in to show how to visualize NA values when creating maps.
 
@@ -96,9 +96,9 @@ To plot the joined data we can use `ggplot2` and the `geom_sf()` function. The c
     geom_sf() 
 ```
 
-![Map first iteration](images/map_first_iteration.png "Map first iteration")
+![Map first iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_first_iteration.png "Map first iteration")
 
-#### Creating a boundary 
+#### Creating a boundary
 
 The first map lacked quite a few things to make the visual useful. The lack of polygon labels and colors to encode testing achievement puts this map in the category of a poorly done base map. Below, we show how to encode target achievement with colors, resulting in a choropleth map. We also take advantage of `sf`'s [`summarise`](https://r-spatial.github.io/sf/reference/tidyverse.html)`()` command to create an outline of the polygons. This can be useful for helping to define the boundary of the area being mapped. To show how different geom parameters affect the map's look, two maps are presented. The first is based on using default parameters and the second version shows how incorporating SIEI colors and helper functions from `glitr` and `gisr` can improve the product.
 
@@ -135,7 +135,7 @@ The first map lacked quite a few things to make the visual useful. The lack of p
   map_lhs + map_rhs
 ```
 
-![Map second and third iterations](images/map_second_iterations.png "Map second and third iteration")
+![Map second and third iterations](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_second_iterations.png "Map second and third iteration")
 
 The visualization on the right is getting us closer to a presentation ready product. We still need to incorporate polygon labels, annotations and titles. Below, we make use of the `geom_sf_text()` function to add in polygon labels.
 
@@ -167,7 +167,7 @@ map_lhs_adorned <-
        caption = caption)
 ```
 
-![Map fourth iteration](images/map_fourth_iteration.png "Map fourth iteration")
+![Map fourth iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_fourth_iteration.png "Map fourth iteration")
 
 Much better, but we can still make a few tweaks that will help this product stand on its own. Complementing the map with bar graph can help the reader compare magnitude differences on the metric being presented without having to do too much math (remember, your job is to make the reader understand a product within 5-10 seconds of seeing it).
 
@@ -201,7 +201,7 @@ Much better, but we can still make a few tweaks that will help this product stan
       plot_annotation(title = "VIRGO AND SERPENS LEAD TESTING ACHEIVEMENT IN FY49") 
 ```
 
-![Combined bar graph and map](images/Map_bar_combined-01.png "Combined bar graph and map")
+![Combined bar graph and map](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/Map_bar_combined-01.png "Combined bar graph and map")
 
 To export this object for additional editing in a vector graphics software, we use the `si_save()` function. This function is a wrapper for ggsave and uses default options to save the plot to a size optimal for presentations (10 x 5.625 inches).
 

@@ -52,7 +52,7 @@ hts_line <-
     si_style_ygrid()
 ```
 
-![Time-series base plot](images/time_series_1_example.png "Time-series plot")
+![Time-series base plot](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/time_series_1_example.png "Time-series plot")
 
 The chart above is a good start. It is clean and clearly shows the decline in testing for Virgo. Adding in a shaded fill and some points can help this plot pop out a bit more. Let's first fill the area below the line in a light gray and add in some dots to help the quarters stand out.
 
@@ -76,7 +76,7 @@ The chart above is a good start. It is clean and clearly shows the decline in te
          caption = caption)
 ```
 
-![Time-series first iteration](images/time_series_2_example.png "Time-series first iteration")
+![Time-series first iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/time_series_2_example.png "Time-series first iteration")
 
 #### Encoding with Size and Color
 
@@ -109,7 +109,7 @@ If you wanted to take this chart a step further, you could encode each dot with 
     theme(legend.position = "none")
 ```
 
-![Time-series second iteration with small multiples and size + color encoding](images/time_series_3_example-01.png "Time-series iteration 2")
+![Time-series second iteration with small multiples and size + color encoding](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/time_series_3_example-01.png "Time-series iteration 2")
 
 To see a series of charts for all the partners, we can use a series of facets. Calculating the average performance across partners by period yields a valuable comparison metric. We then organize the partners from over to under performing. To highlight data points above/below average, we use a conditional fill on dots placed on the line graph. Negative space is created by shading the stroke around each dot with a white fill. A light grade shaded area shows the magnitude of deviation from the mean. Finally, we clean up the x-axis labels using a manual scale with line breaks to align fiscal quarters.
 
@@ -154,4 +154,4 @@ hts_line_order <-
     theme(axis.text = element_text(size = 8))
 ```
 
-![Time-series final iteration](images/time_series_4_example.png "Time-series final iteration")
+![Time-series final iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/time_series_4_example.png "Time-series final iteration")

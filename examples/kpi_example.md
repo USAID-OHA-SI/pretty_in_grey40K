@@ -74,4 +74,4 @@ KPIs are useful for summarizing a metric or series of metrics. KPI graphics shou
     si_save(file.path(pub_images, "kpi"), plot = p, width = 8, height = 0.75)
 ```
 
-![Key Performance Metric Graphic](images/kpi.png "KPI")
+![Key Performance Metric Graphic](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/kpi.png "KPI")

@@ -207,17 +207,25 @@ If you wanted to take this chart a step further, you could encode each dot with 
   hts_line %>% 
     filter(primepartner %in% c("Virgo", "Ursa Major", "Capricornus"), 
            indicator == "HTS_TST") %>% 
-    ggplot(aes(x = period, y = qtr_totals, group = primepartner)) +
+    ggplot(aes(x = period, 
+               y = qtr_totals, 
+               group = primepartner)) +
     geom_line() +
     geom_area(fill = grey10k, alpha = .75) +
-    geom_point(aes(fill = qtr_totals, size = qtr_totals), 
-               shape = 21, color = "white", stroke = 1) +
-    scale_fill_si(palette = "genoas", discrete = FALSE, reverse = TRUE) +
+    geom_point(aes(fill = qtr_totals, 
+                   size = qtr_totals), 
+               shape = 21, 
+               color = "white", 
+               stroke = 1) +
+    scale_fill_si(palette = "genoas", 
+                  discrete = FALSE) +
     facet_wrap(~primepartner) +
     si_style_ygrid() +
     scale_size_area() +
     scale_x_discrete(labels = c("Q1\nFY49", "Q2\n", "Q3\n", "Q4\n", "Q1\nFY50"))+
-    labs(x = NULL, y = NULL, title = "TESTING VOLUMES DOWN IN FY50Q1",
+    labs(x = NULL, 
+         y = NULL, 
+         title = "TESTING VOLUMES DOWN IN FY50Q1",
          caption = caption) +
     theme(legend.position = "none")
   si_save(here(pub_images, "time_series_3_example.png"))

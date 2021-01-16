@@ -55,13 +55,13 @@ hts_dev <-
    filter(primepartner != "Dedup")
 ```
 
-![working data frame after pivot_wider operation](images/hts_dev_wide.png "working data frame after pivot_wider operation")
+![working data frame after pivot_wider operation](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/hts_dev_wide.png "working data frame after pivot_wider operation")
 
 #### Creating Partner Flags
 
 With the main data munging complete, we turn our attention to creating variables we can use in our deviation plot. First, we generate a simple deviation plot in black and white to get a sense of what the over/under-achievement distribution looks like.
 
-![deviation plot first iteration](images/deviation_plot_1.png "deviation plot first iteration")
+![deviation plot first iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/deviation_plot_1.png "deviation plot first iteration")
 
 The next step is to encode partners falling short of the overall achievement average with a different color. Two vertical lines are added at the zero value of the x-axis. This help anchor the deviating bars. Finally, the x-axis is changed to a percentage.
 
@@ -82,4 +82,4 @@ The next step is to encode partners falling short of the overall achievement ave
         subtitle = "Green (red) depicts partners above (below) the acheivement average.")
 ```
 
-![](images/deviation_plot_2.png "deviation plot second iteration with colors added")
+![deviation plot](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/deviation_plot_2.png "deviation plot second iteration with colors added")

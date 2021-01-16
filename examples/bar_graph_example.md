@@ -49,7 +49,7 @@ When munging the hts data for the bar graph, make use of the `forcats::fct_reord
     si_style_xgrid()
 ```
 
-![Unsorted bar graph](images/Unsorted_bar.png "Unsorted bar graph")
+![Unsorted bar graph](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/Unsorted_bar.png "Unsorted bar graph")
 
 Sort the partners variable by yield and then plot as a rotated, sorted bar graph. Notice that we are using the `si_style_xgrid()` option from the `glitr` package to call baked-in formatting.
 
@@ -66,7 +66,7 @@ Sort the partners variable by yield and then plot as a rotated, sorted bar graph
     si_style_xgrid()
 ```
 
-![Sorted bar graph](images/Sorted_bar.png "Sorted bar graph")
+![Sorted bar graph](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/Sorted_bar.png "Sorted bar graph")
 
 This plot can be further polished by i) highlighting all partners that have yields higher than 20% ii) touching up the axes labels and iii) adding in a title and caption. If using the graphic in a presentation, adding additional annotation, such as why these two prime partners were such high performers, would be recommended as well.
 
@@ -95,4 +95,4 @@ To highlight the partners that have achieved beyond a given threshold, we create
     theme(axis.text.y = element_text(colour = label_colors))
 ```
 
-![Final bar graph with SIEI colors (scooter) incorporate to highlight high performers.](images/bar_chart_example.png "Adorned bar graph")
+![Final bar graph with SIEI colors (scooter) incorporate to highlight high performers.](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/bar_chart_example.png "Adorned bar graph")

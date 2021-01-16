@@ -73,7 +73,7 @@ We start with a bar graph that summarizes achievement. An effective method for s
     labs(y = NULL) 
 ```
 
-![bar graph for achievement](images/ach_bar_rhs-02.png "bar graph for achievement")
+![bar graph for achievement](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/ach_bar_rhs-02.png "bar graph for achievement")
 
 Next, we create a basic geom_point graph that takes a filled value when a partner has reached 100% achievement or higher. A new \`Targets Achieved\` variable is created as a constant. This is a placeholder to align the plot along the x-dimension. We strip all formatting except the x-axis title. This is moved to the top.
 
@@ -95,7 +95,7 @@ Next, we create a basic geom_point graph that takes a filled value when a partne
           axis.title.y = element_blank())
 ```
 
-![filled circles to be placed in middle section](images/ach_circle_middle_2.png "filled circles to be placed in middle section")
+![filled circles to be placed in middle section](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/ach_circle_middle_2.png "filled circles to be placed in middle section")
 
 Next, we create a column summarizing how near or far a prime partner is from their set targets. We use a `geom_text()` call to plot the calculated metric in a single column. The partners are ordered by achievement so the order remains constant across all plots.
 
@@ -120,7 +120,7 @@ Next, we create a column summarizing how near or far a prime partner is from the
           axis.title.y = element_blank()) 
 ```
 
-![gap summary column](images/hts_gap_middle_1.png "gap summary column")
+![gap summary column](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/hts_gap_middle_1.png "gap summary column")
 
 The final piece of the graphic is a column summarizing the actual cumulative results and targets for each partner. Similar to the plot above, we use a `geom_text()` call to print the results in a column. The `paste0` function is used to glue together the results and targets. In the `theme()` section of the ggplot chunk, we pass the `ach_color` object which allows for conditionally formatting the partner names.
 
@@ -146,7 +146,7 @@ The final piece of the graphic is a column summarizing the actual cumulative res
                                      family = "Source Sans Pro SemiBold"))
 ```
 
-![summary table column](images/hts_table_lhs.png "summary table column")
+![summary table column](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/hts_table_lhs.png "summary table column")
 
 The final step is to append each plot together using the `patchwork` package. The `plot_layout` option allows us to control the width of each plot. To ensure the summary table and bar graph fit, we tinker with the width size until we arrive at a satisfactory value.
 
@@ -162,4 +162,4 @@ The final step is to append each plot together using the `patchwork` package. Th
          title = "SEVEN OF TWELVE PARTNERS ACHIEVED HTS TARGETS")
 ```
 
-![Combined achievement plot](images/ach_table_plot.png "Combined achievement plot")
+![Combined achievement plot](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/ach_table_plot.png "Combined achievement plot")
