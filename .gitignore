@@ -19,4 +19,4 @@ GIS/*
 Images/*
 Graphics/*
 
-Graphics_tutorial.rmd
+*.rmd
