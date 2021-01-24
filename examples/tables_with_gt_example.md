@@ -73,7 +73,7 @@ gt_table <- gt(data = hts_dev_wide)
 gt_table
 ```
 
-![gt table first iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/gt_iteration1.png "gt table first iteration")
+![gt table first iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/gt_iteration1.png "gt table first iteration"){width="1337"}
 
 As you see from the table preview, we have quite a bit of work to do in formatting columns. Interestingly, the `gt` function read the 2nd column of the data frame we passed as a *row group* label.
 
@@ -112,7 +112,7 @@ gt_table <-
   tab_options(table.font.names = "Source Sans Pro") 
 ```
 
-![Table second iteration](images/gt_iteration2.png "Table second iteration")
+![Table second iteration](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/gt_iteration2.png "Table second iteration"){width="377"}
 
 In the final iteration, we make a few cosmetic changes to the table pop a bit more. We use a splash of color to highlight testing results that surpass 100K. Row headers and footers are increased in size to help separate the two indicators.
 
@@ -146,6 +146,6 @@ gt_table %>%
   
 ```
 
-![Table final iteration](images/Table%20final%20iteration.png "Table final iteration")
+![Table final iteration](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/Table%2520final%2520iteration.png "Table final iteration"){width="344"}
 
 For a thorough review of tables best practices and loads of gt tables examples, visit [The Mockup Blog](https://themockup.blog/posts/2020-09-04-10-table-rules-in-r/).
