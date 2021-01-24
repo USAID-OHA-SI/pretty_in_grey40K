@@ -1,11 +1,13 @@
 ---
 layout: post
-title: "Key Performance Indicators Example"
+title: "Key Performance Indicators"
 author: Tim Essam | SI
 date: 2021-01-12
 categories: [vignette]
 tags: [ggplot]
 ---
+
+KPIs are useful for summarizing a metric or series of metrics. KPI graphics should be simple and easy to interpret. 
 
 ```{r}
 # Setup knitr defaults and folder paths

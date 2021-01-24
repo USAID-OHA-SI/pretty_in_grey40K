@@ -1,11 +1,13 @@
 ---
 layout: post
 title: "Combining Plots To Summarize Achievement"
-author: Tim Essam \| SI
+author: Tim Essam | SI
 date: 2021-01-12
 categories: [vignette]
 tags: [ggplot]
 ---
+
+Combining multiple types of graphs is made easy with the `patchwork` package. In this example, we show how to combine multiple plots to summarize acheivement across numerous dimenions.
 
 ### Target Achievement Summary
 

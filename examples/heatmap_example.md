@@ -1,11 +1,13 @@
 ---
 layout: post
 title: "Summarizing Mutliple Dimensions with Heatmaps"
-author: Tim Essam \| SI
+author: Tim Essam | SI
 date: 2021-01-22
 categories: [vignette]
 tags: [ggplot]
 ---
+
+Heatmaps are useful for showing a phenomenon or metric across multiple dimensions. They can be used to show how a metric evolves across time and categories, or across multiple categories. Color and arrangement are the primary visual cues used to help the reader understand the phenomenon.
 
 ```{r}
 # Setup knitr defaults and folder paths

@@ -1,11 +1,13 @@
 ---
 layout: post
-title: "Key Performance Indicators Example"
+title: "Publication Quality Tables"
 author: Tim Essam | SI
 date: 2021-01-12
 categories: [vignette]
 tags: [gt]
 ---
+
+Sometimes a well formatted table can be as effective as a visualization. In this example, we will go show you how use the `gt` package to generate a high-quality table.
 
 ```{r}
 # Setup knitr defaults and folder paths
@@ -19,7 +21,7 @@ tags: [gt]
 
 ### Using `gt` to make publication quality tables
 
-Sometimes a well formatted table can be as effective as a visualization. In this example, we will go show you how use the `gt` package to generate a high-quality table. The `gt` [package](s%20all%20about%20making%20it%20simple%20to%20produce%20nice-looking%20display%20tables) is all about making it simple to produce nice-looking display tables. As before, we'll use the `hts` testing data to create our table.
+The `gt` [package](s%20all%20about%20making%20it%20simple%20to%20produce%20nice-looking%20display%20tables) is all about making it simple to produce nice-looking display tables. As before, we'll use the `hts` testing data to create our table.
 
 ```{r}
   library(tidyverse)
@@ -106,10 +108,13 @@ gt_table <-
     formatter = fmt_number,
     use_seps = TRUE,
     decimals = 0
-  ) +
-  tab_options(table.font.names = "Source Sans Pro")
-  
+  ) %>% 
+  tab_options(table.font.names = "Source Sans Pro") 
 ```
+
+![Table second iteration](images/gt_iteration2.png "Table second iteration")
+
+In the final iteration, we make a few cosmetic changes to the table pop a bit more. We use a splash of color to highlight testing results that surpass 100K. Row headers and footers are increased in size to help separate the two indicators.
 
 ```{r}
 # The HTML decimal references for the black
@@ -126,16 +131,21 @@ gt_table %>%
                 row_group.border.top.width = px(3),
                 row_group.border.top.color = "black",
                 row_group.border.bottom.color = "black",
-                table_body.border.bottom.width = px(2),
+                table_body.border.bottom.width = px(3),
                 table_body.border.bottom.color = "black") %>% 
-   data_color(
-    columns = 2:4, 
+     data_color(
+    columns = 2:4,
     colors = scales::col_numeric(
-      palette = paletteer::paletteer_d(
-        palette = "ggsci::blue_material"
+      palette = glitr::si_rampr(  
+        pal_name = "denims"
       ) %>% as.character(),
-      domain = NULL
+      domain = c(1e5, 4e5), # US the domain to set the bounds on which colors are applied
+      na.color = "white"
     )
   )
   
 ```
+
+![Table final iteration](images/Table%20final%20iteration.png "Table final iteration")
+
+For a thorough review of tables best practices and loads of gt tables examples, visit [The Mockup Blog](https://themockup.blog/posts/2020-09-04-10-table-rules-in-r/).

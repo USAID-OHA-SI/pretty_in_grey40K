@@ -1,11 +1,13 @@
 ---
 layout: post
-title: "Key Performance Indicators Example"
+title: "Bar Graphs"
 author: Tim Essam | SI
 date: 2021-01-12
 categories: [vignette]
 tags: [ggplot]
 ---
+
+Bar graphs are one of the most effective ways of comparing the magnitudes of a metric aross numerous categories.
 
 ```{r}
 # Setup knitr defaults and folder paths

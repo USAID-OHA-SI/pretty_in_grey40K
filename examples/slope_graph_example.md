@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Ranking (slope charts) Example"
-author: Tim Essam \| SI
+title: "Ranking (slope charts)"
+author: Tim Essam | SI
 date: 2021-01-12
 categories: [vignette]
 tags: [ggplot]

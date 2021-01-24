@@ -1,11 +1,13 @@
 ---
 layout: post
-title: "Key Performance Indicators Example"
-author: Tim Essam \| SI
+title: "Maps"
+author: Tim Essam | SI
 date: 2021-01-12
 categories: [vignette]
 tags: [ggplot]
 ---
+
+Maps convey geographic patterns of data using coordinates and polygons. Maps are useful for showing spatial correlations or the geographic distribution of a metric.
 
 ### Required packages
 

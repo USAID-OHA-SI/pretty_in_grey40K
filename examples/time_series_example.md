@@ -1,11 +1,13 @@
 ---
 layout: post
-title: "Showing Change Over Time Example"
+title: "Showing Change Over Time"
 author: Tim Essam | SI
 date: 2021-01-12
 categories: [vignette]
 tags: [ggplot]
 ---
+Time-series plots are an effective means for showing how a metric or series of metrics evovles across a fixed period of time. The use of small multiples more effectively can communicate how time-series vary across categories thereby avoided the often confusing spaghetti or dual axis plot.
+
 
 ### Showing Change Over Time (Time-Series Chart)
 
