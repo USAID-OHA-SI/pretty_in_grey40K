@@ -98,7 +98,7 @@ To plot the joined data we can use `ggplot2` and the `geom_sf()` function. The c
     geom_sf() 
 ```
 
-![Map first iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_first_iteration.png "Map first iteration")
+![Map first iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_first_iteration.png "Map first iteration"){width="1778"}
 
 #### Creating a boundary
 
@@ -137,7 +137,7 @@ The first map lacked quite a few things to make the visual useful. The lack of p
   map_lhs + map_rhs
 ```
 
-![Map second and third iterations](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_second_iterations.png "Map second and third iteration")
+![Map second and third iterations](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_second_iterations.png "Map second and third iteration"){width="1778"}
 
 The visualization on the right is getting us closer to a presentation ready product. We still need to incorporate polygon labels, annotations and titles. Below, we make use of the `geom_sf_text()` function to add in polygon labels.
 
@@ -169,7 +169,7 @@ map_lhs_adorned <-
        caption = caption)
 ```
 
-![Map fourth iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_fourth_iteration.png "Map fourth iteration")
+![Map fourth iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/map_fourth_iteration.png "Map fourth iteration"){width="1778"}
 
 Much better, but we can still make a few tweaks that will help this product stand on its own. Complementing the map with bar graph can help the reader compare magnitude differences on the metric being presented without having to do too much math (remember, your job is to make the reader understand a product within 5-10 seconds of seeing it).
 
@@ -203,7 +203,7 @@ Much better, but we can still make a few tweaks that will help this product stan
       plot_annotation(title = "VIRGO AND SERPENS LEAD TESTING ACHEIVEMENT IN FY49") 
 ```
 
-![Combined bar graph and map](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/Map_bar_combined-01.png "Combined bar graph and map")
+![Combined bar graph and map](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/Map_bar_combined-01.png "Combined bar graph and map"){width="1778"}
 
 To export this object for additional editing in a vector graphics software, we use the `si_save()` function. This function is a wrapper for ggsave and uses default options to save the plot to a size optimal for presentations (10 x 5.625 inches).
 

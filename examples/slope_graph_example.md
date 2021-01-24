@@ -57,7 +57,7 @@ A slope plot or connected line graph is an effective way to show discrete change
     si_style_xline()
 ```
 
-![*Slope plot first iteration - who dropped the spaghetti?*](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_1.png "slope plot first iteration")
+![*Slope plot first iteration - who dropped the spaghetti?*](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_1.png "slope plot first iteration"){width="1778"}
 
 While the graph above shows the decline for most partners, it is hard to see if any partners had better performance in FY50Q1. If we look at the munged data, see that Ophiuchus actually had tested more individuals in FY50Q1. We can use color to help draw this anomaly out.
 
@@ -82,7 +82,7 @@ We finish by expanding the x-scale with the `expand` argument in the `scale_x_di
          caption = caption)
 ```
 
-![Slope plot second iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_2.png "slope plot second iteration")
+![Slope plot second iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_2.png "slope plot second iteration"){width="1778"}
 
 This plot could be further polished by adding in some annotation and calling out the partners with the largest percentage changes. Another option would be to group the partners by the degree of annual change in testing. The `cut_interval()` command will create a given number of groups with equal ranges. Below, `n`, the number of groups to be calculated, is set to three to group partners into large, medium and small clusters. We then make use of the `facet_wrap()` option to plot these three groups in a single row.
 
@@ -108,7 +108,7 @@ This plot could be further polished by adding in some annotation and calling out
          caption = caption)
 ```
 
-![Slope plot third iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_3.png "slope plot third iteration")
+![Slope plot third iteration](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_3.png "slope plot third iteration"){width="1778"}
 
 #### Integrated Labels for Clarity
 
@@ -155,6 +155,6 @@ The previous plots are great for highlighting the performance of a single partne
 
 ```
 
-![Slope plot final iteration with direct labels](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_labeled.png "Slope plot final iteration with direct labels")
+![Slope plot final iteration with direct labels](https://github.com/USAID-OHA-SI/pretty_in_grey40K/raw/main/examples/images/slope_plot_labeled.png "Slope plot final iteration with direct labels"){width="1778"}
 
 As a final step, this plot could benefit from some annotation summarizing why these declines occurred. It may also be useful to add in a note on which partner had the largest decline. This may also help orient the reader on how to interpret the plot.
