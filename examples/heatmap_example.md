@@ -59,7 +59,7 @@ In this example, we will create a heatmap summarizing the positivity rate by tes
     si_style_nolines()
 ```
 
-![Heatmap first iteration](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/heatmap_iteration1.png "Heatmap first iteration"){width="1778"}
+![Heatmap first iteration](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/heatmap_iteration1.png "Heatmap first iteration")
 
 This first iteration is OK. There are quite a few things we can do to improve the readability of the graphic. We'll start by i) moving the primepartner names to the top using the `scale_x_discrete()` argument, ii) then we will add a white stroke around each box by passing a color argument to the `geom_tile()` line, iii) finally, we can add a `geom_text()` to each tile to help the reader more easily understand how the color intensity is encoded to the positivity rate.
 
@@ -79,7 +79,7 @@ This first iteration is OK. There are quite a few things we can do to improve th
     theme(panel.background = element_rect(fill = "#f6f6f6", color ="white"))
 ```
 
-![Heatmap second iteration](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/heatmap_iteration2.png "Heatmap second iteration"){width="1778"}
+![Heatmap second iteration](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/heatmap_iteration2.png "Heatmap second iteration")
 
 This looks much better. But, we could make the text a bit more readable by using a darker text color for squares with low positivity rates. We can also add a subtle grayish background to help bound the squares a bit. We can also experiment with the `coord_fixed()`. This will keep our tiles a fixed square shape. This option can be useful when you want to squish rectangles back into squares or vice versa. Finally, to ensure that our x-axis labels do not overlap we can use the `guide_axis()` function in the `scale_x_discrete()` call to make sure x-axis titles are dodged (non-overlapping).
 
@@ -107,6 +107,6 @@ This looks much better. But, we could make the text a bit more readable by using
     coord_fixed(ratio = 1)
 ```
 
-![Heatmap final product](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/heatmap_iteration3.png "Heatmap final product"){width="1775"}
+![Heatmap final product](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/heatmap_iteration3.png "Heatmap final product")
 
 As a finishing feature, we recommend added some basic annotation to provide contextual information about squares with high positivity rates (did these modalities / partners only test a handful of people? etc.)

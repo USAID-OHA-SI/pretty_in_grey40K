@@ -80,36 +80,10 @@ As you see from the table preview, we have quite a bit of work to do in formatti
 ```{r}
 # Set our data frame to be a gt object and declare a groupname_col
 # We also hide columns that we are not interested in by using the cols_hide() function
-gt_table <- 
-  hts_dev_wide %>% 
-    group_by(primepartner) %>% 
-    arrange(desc(achievement)) %>% 
-    ungroup() %>% 
-  gt(groupname_col = "indicator", 
-     rowname_col = "primepartner") %>% 
-  cols_hide(
-    columns = vars(
-      annual_results, annual_targets, annual_achievement, deviation, partner_order)
-  ) %>% 
-   fmt_number(
-    columns = vars(cumulative, targets),
-    decimals = 0,
-    use_seps = TRUE
-  ) %>% 
-   fmt_percent(
-    columns = vars(achievement),
-    decimals = 0,
-  )  %>% 
-   summary_rows(
-    groups = TRUE,
-    columns = vars(cumulative, targets),
-    fns = list(
-      totals = ~sum(.)),
-    formatter = fmt_number,
-    use_seps = TRUE,
-    decimals = 0
-  ) %>% 
-  tab_options(table.font.names = "Source Sans Pro") 
+gt_table <- gt(data = hts_dev_wide)
+
+# preview the table
+gt_table
 ```
 
 ![Table second iteration](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/gt_iteration2.png "Table second iteration"){width="377"}
