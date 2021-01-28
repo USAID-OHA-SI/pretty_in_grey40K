@@ -115,6 +115,6 @@ gt_table %>%
   
 ```
 
-[![Final table](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/Table%2520final%2520iteration-01.png "Final table")](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/Table%20final%20iteration-01.png)
+[![Final table](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/Table%20final%20iteration-01.png "Final table")](https://raw.githubusercontent.com/USAID-OHA-SI/pretty_in_grey40K/main/examples/images/Table%20final%20iteration-01.png)
 
 For a thorough review of tables best practices and loads of gt tables examples, visit [The Mockup Blog](https://themockup.blog/posts/2020-09-04-10-table-rules-in-r/).
