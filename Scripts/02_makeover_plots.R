@@ -17,6 +17,7 @@ library(glue)
 library(ggtext)
 library(RColorBrewer)
 library(svglite)
+library(patchwork)
 
 # GLOBAL VARIABLES --------------------------------------------------------
 
@@ -98,12 +99,12 @@ library(svglite)
                label.size = 0, family = "Source Sans Pro", alpha = .6,
                na.rm = TRUE) +
     expand_limits(y = c(0, 1400)) +
-    scale_color_manual(values = c("gray80", USAID_medblue)) +
+    scale_color_manual(values = c("gray80", usaid_medblue)) +
     scale_y_continuous(expand = c(0, 0), labels = comma,
                        breaks = seq(from = 0, to = 1400, by = 200)) +
     scale_x_discrete(expand = c(0, .25)) +
     labs(x = NULL, y = NULL,
-         title = "LARGE TREATMENT GAINS MADE BY <span style = 'color:#0067B9;'>URSA MAJOR</span> IN FY49",
+         title = "LARGE TREATMENT GAINS MADE BY<br><span style = 'color:#0067B9;'>URSA MAJOR</span> IN FY49",
          color = NULL,
          caption = glue("Source: {max(cascade$period)} MSD")
     ) +
@@ -112,7 +113,7 @@ library(svglite)
           legend.position = "none")
 
   # ggsave("Images/line_remake.png", dpi = 300, height = 4.71, width = 7.31)
-  ggsave("Images/line_remake.svg", dpi = 300, height = 4.71, width = 7.31)
+  ggsave("Images/line_remake.svg", dpi = 300, height = 4.82, width = 4.9306)
 
 
 
@@ -151,12 +152,12 @@ library(svglite)
 
 
     # ggsave("Images/bar_default.png", dpi = 300, height = 4.71, width = 7.31)
-    ggsave("Images/bar_default.svg", dpi = 300, height = 4.71, width = 7.31)
+    ggsave("Images/bar_default.svg", dpi = 300, height = 4.82, width = 4.9306)
 
 
 
     df_bar_adj <- df_bar %>%
-      mutate(modality = fct_lump(modality, 5, w = targets, other_level = "All Other Modalities")) %>%
+      mutate(modality = fct_lump(modality, 5, w = targets, other_level = "All Other")) %>%
       filter(targets > 0) %>%
       group_by(period, modality) %>%
       summarise(across(c(targets, cumulative), sum, na.rm = TRUE)) %>%
@@ -166,9 +167,9 @@ library(svglite)
              modality = recode(modality,
                                "OtherPITC" = "Other PITC",
                                "TBClinic" = "TB Clinic"),
-             mod_lab = glue("{modality} [{comma(cumulative, 1)}/{comma(targets, 1)}]") %>%
+             mod_lab = glue("{modality}\n[{comma(cumulative, 1)}/{comma(targets, 1)}]") %>%
                fct_reorder(cumulative) %>%
-               fct_relevel("All Other Modalities [890/630]", after = 0)
+               fct_relevel("All Other\n[890/630]", after = 0)
              )
 
     df_bar_adj %>%
@@ -181,11 +182,11 @@ library(svglite)
                     hjust = -.4)) +
       scale_x_continuous(expand = c(.005, .005), labels = percent,
                          breaks = seq(0, 2.5, .5)) +
-      scale_fill_manual(values = c("gray30", pal_achv[1])) +
-      scale_color_manual(values = c("gray30", pal_achv[1])) +
+      scale_fill_manual(values = c("gray30", "#c43d4d")) +
+      scale_color_manual(values = c("gray30", "#c43d4d")) +
       labs(x = NULL, y = NULL,
-           title = "SPECIAL ATTENTION SHOULD BE PAID TO <br>AURIGA'S <span style = 'color:#D7191C;'>OTHER PITC</span> AND <span style = 'color:#D7191C;'>PMTCT</span> ENTRY POINTS",
-           subtitle = "HTS_TST_POS Achievement, sorted by cumulative results",
+           title = "SPECIAL ATTENTION SHOULD BE PAID TO <br>AURIGA'S <span style = 'color:#c43d4d;'>OTHER PITC</span> AND <span style = 'color:#c43d4d;'>PMTCT</span><br>ENTRY POINTS",
+           subtitle = "HTS_TST_POS Achievement,\nsorted by cumulative results",
            caption =  glue("Source: {max(hts$period)} MSD")) +
       si_style_xgrid() +
       theme(legend.position = "none",
@@ -194,7 +195,7 @@ library(svglite)
 
 
     # ggsave("Images/bar_makeover.png", dpi = 300, height = 4.71, width = 7.31)
-    ggsave("Images/bar_makeover.svg", dpi = 300, height = 4.71, width = 7.31)
+    ggsave("Images/bar_makeover.svg", dpi = 300, height = 4.82, width = 4.9306)
 
 
 
@@ -219,7 +220,7 @@ library(svglite)
       mutate(partner_fill = primepartner == "Libra")
 
 
-    df_stack %>%
+    orig_stack <- df_stack %>%
       ggplot(aes(period, value, fill = primepartner)) +
       geom_col() +
       # geom_text(aes(label = value)) +
@@ -228,24 +229,34 @@ library(svglite)
       labs(title = "TX_NEW in Saturn Partners")
 
     # ggsave("Images/stacked_default.png", dpi = 300, height = 4.71, width = 7.31)
-    ggsave("Images/stacked_default.svg", dpi = 300, height = 4.71, width = 7.31)
+    ggsave("Images/stacked_default.svg", dpi = 300, height = 4.82, width = 4.9306)
 
 
-    df_stack %>%
+    rmk_stack <- df_stack %>%
       ggplot(aes(period, value, fill = partner_fill)) +
       geom_col() +
       geom_hline(yintercept = 0) +
       facet_wrap(~factor(primepartner, ptnr_sel)) +
       scale_y_continuous(label = comma) +
       scale_x_discrete(breaks = c("FY48Q1", "FY49Q1", "FY50Q1")) +
-      scale_fill_manual(values = c("gray70", USAID_medblue)) +
+      scale_fill_manual(values = c("gray70", scooter)) +
       labs(x = NULL, y = NULL,
-           title = "<span style = 'color:#0067B9;'>LIBRA </span> SAW POSITIVE TX_NEW GROWTH IN Q1 WHILE OTHERS FALTERED",
+           title = "<span style = 'color:#1e87a5;'>LIBRA </span> SAW POSITIVE TX_NEW GROWTH IN Q1<br> WHILE OTHERS FALTERED",
            caption =  glue("Source: {max(hts$period)} MSD")
              ) +
       si_style_nolines() +
       theme(legend.position = "none",
+            panel.spacing = unit(1, "lines"),
             plot.title = element_markdown())
 
     # ggsave("Images/stacked_makeover.png", dpi = 300, height = 4.71, width = 7.31)
-    ggsave("Images/stacked_makeover.svg", dpi = 300, height = 4.71, width = 7.31)
+    ggsave("Images/stacked_makeover.svg", dpi = 300,  height = 4.82, width = 4.9306)
+    
+    h = 4.82
+    
+    orig_stack + plot_spacer() + rmk_stack +
+      plot_layout(widths = unit(c(4.9306 , .25, 4.9306), 'in'), heights = unit(4.82, 'in'))
+    
+    ggsave("Images/stacked_duo.svg", dpi = 300, width = 10.1112, height = 4.82)
+    
+    
