@@ -80,7 +80,26 @@ As you see from the table preview, we have quite a bit of work to do in formatti
 ```{r}
 # Set our data frame to be a gt object and declare a groupname_col
 # We also hide columns that we are not interested in by using the cols_hide() function
-gt_table <- gt(data = hts_dev_wide)
+gt_table <- gt(data = hts_dev_wide %>% arrange(desc(achievement)),
+               groupname_col = "indicator",
+               rowname_col= "primepartner") %>% 
+  cols_hide(columns = vars(
+    annual_results,
+    annual_targets,
+    annual_achievement,
+    deviation,
+    partner_order
+  )) %>% 
+  fmt_number(columns = 3:4, decimals = 0) %>% 
+  fmt_percent(columns = "achievement", decimals = 0) %>% 
+  summary_rows(columns = 3:4,
+               fns = list(
+      total = "sum"),
+      groups = TRUE,
+      decimals = 0,
+      formatter = fmt_number)
+                     
+  
 
 # preview the table
 gt_table
