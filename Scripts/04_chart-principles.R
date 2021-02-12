@@ -2,7 +2,7 @@
 ## AUTHOR:  A.Chafetz & T.Essam | USAID
 ## PURPOSE: viz for chart principles (not ideal-> good plots)
 ## DATE:    2021-01-15
-## UPDATED: 2021-01-30
+## UPDATED: 2021-02-11
 
 
 # DEPENDENCIES ------------------------------------------------------------
@@ -21,6 +21,7 @@ library(patchwork)
 library(tidytuesdayR)
 library(TrainingDataset) #remotes::install_github("ICPI/TrainingDataset")
 library(plotrix)
+library(ggthemes)
 
 
 # ENSURE FOLDER STRUCTURE -------------------------------------------------
@@ -34,6 +35,7 @@ library(plotrix)
   brew <- tt_load('2020-03-31')
 
   beer_states <- brew$beer_states
+  beer_taxed <- brew$beer_taxed
   brewing_materials <- brew$brewing_materials
   brewer_size <- brew$brewer_size
 
@@ -350,7 +352,64 @@ brewing_materials %>%
 
 # Alignment and equal intervals -------------------------------------------
 
-  #??
+  beer_taxed %>% 
+    glimpse()
+  
+  beer_taxed %>%
+    filter(tax_status == "Taxable",
+           type == "In bottles and cans",
+           year == "2013",
+           month != 12) %>% 
+    mutate(group = case_when(month <= 3 ~ "Q1",
+                             month <= 6 ~ "Q2",
+                             month <= 9 ~ "Q3",
+                             month == 10 ~ "Jul",
+                             month == 11 ~ "Aug"),
+           group = factor(group, c("Q1", "Q2", "Q3", "Jul", "Aug"))) %>% 
+    group_by(group) %>% 
+    summarise(taxable_sum = sum(month_current)) %>% 
+    ungroup() %>% 
+    ggplot(aes(group, taxable_sum, fill = group)) +
+    geom_col() +
+    scale_fill_si("denim") +
+    labs(x = NULL, y = NULL, fill = NULL) +
+    si_style_ygrid() +
+    theme(legend.position = "none",
+          axis.text.y = element_blank()) 
+  
+  ggsave("cp_position_intervals_notideal.svg", 
+         path = "Graphics",
+         width = 2.0119, height = 1.75)
+  
+  
+  beer_taxed %>%
+    filter(tax_status == "Taxable",
+           type == "In bottles and cans",
+           year == "2013",
+           month != 12) %>% 
+    mutate(group = case_when(month <= 3 ~ "Q1",
+                             month <= 6 ~ "Q2",
+                             month <= 9 ~ "Q3",
+                             TRUE ~ "Q4")) %>% 
+    group_by(group) %>% 
+    summarise(taxable_sum = sum(month_current)) %>% 
+    ungroup() %>% 
+    mutate(full_qtr = case_when(group != "Q4" ~ taxable_sum),
+           partial_qtr = case_when(group == "Q4" ~ taxable_sum),
+           type = group == "Q4") %>% 
+    ggplot(aes(group, full_qtr, fill = type)) +
+    geom_col(na.rm = TRUE) +
+    geom_col(aes(y = partial_qtr), na.rm = TRUE) +
+    scale_fill_manual(values = c(denim, scooter_light)) +
+    labs(x = NULL, y = NULL, fill = NULL) +
+    si_style_ygrid() +
+    theme(legend.position = "none",
+          axis.text.y = element_blank()) 
+  
+  ggsave("cp_position_intervals_better.svg", 
+         path = "Graphics",
+         width = 2.0119, height = 1.75)
+  
   
 # Axis lines start at appropriate values ----------------------------------
 
@@ -477,9 +536,138 @@ brewing_materials %>%
   
 # Free of chart junk ------------------------------------------------------
 
-  #??
   
-  #heat chart with 
+  
+  brewing_materials %>% 
+    filter(year == 2016,
+           type %in% c("Hops (dry)", "Wheat and wheat products")) %>% 
+    mutate(quarter = case_when(month <= 3 ~ "Q1",
+                               month <= 6 ~ "Q2",
+                               month <= 9 ~ "Q3",
+                               TRUE ~ "Q4"),
+           sex = ifelse(type == "Hops (dry)", "Female", "Male")) %>%
+    group_by(sex, quarter) %>% 
+    summarise(value = sum(month_current, na.rm = TRUE)) %>% 
+    ungroup() %>% 
+    ggplot(aes(sex, value, fill = sex)) +
+    geom_blank(aes(y = value * 1.05)) +
+    geom_col() +
+    facet_wrap(~quarter, scale = "free_x", nrow = 1, strip.position = "bottom") +
+    scale_y_continuous(expand = c(.01, .01)) +
+    scale_fill_excel_new() +
+    labs(x = NULL, y = NULL) +
+    theme_excel_new() +
+    theme(strip.placement = "outside",
+          legend.position = "none")
+  
+  ggsave("cp_position_junk_notideal.svg",
+         path = "Graphics",
+         width = 2.0119, height = 1.75)
+  
+  
+  
+  # brewing_materials %>% 
+  #   filter(year == 2016,
+  #          type %in% c("Hops (dry)", "Wheat and wheat products")) %>% 
+  #   mutate(quarter = case_when(month <= 3 ~ "Q1",
+  #                              month <= 6 ~ "Q2",
+  #                              month <= 9 ~ "Q3",
+  #                              TRUE ~ "Q4"),
+  #          sex = ifelse(type == "Hops (dry)", "Female", "Male"),
+  #          month_current = month_current / 100000) %>%
+  #   group_by(sex, quarter) %>% 
+  #   summarise(value = sum(month_current, na.rm = TRUE)) %>% 
+  #   ungroup() %>% 
+  #   ggplot(aes(quarter, value, fill = sex)) +
+  #   geom_blank(aes(y = value * 1.05)) +
+  #   geom_col() +
+  #   facet_wrap(~sex, scale = "free_x", nrow = 1) +
+  #   scale_y_continuous(expand = c(.01, .01)) +
+  #   scale_fill_manual(values = c(moody_blue, genoa)) +
+  #   labs(x = NULL, y = NULL) +
+  #   si_style_ygrid() +
+  #   theme(legend.position = "none")
+  
+  
+  brewing_materials %>% 
+    filter(year == 2016,
+           type %in% c("Hops (dry)", "Wheat and wheat products")) %>% 
+    mutate(quarter = case_when(month <= 3 ~ "Q1",
+                               month <= 6 ~ "Q2",
+                               month <= 9 ~ "Q3",
+                               TRUE ~ "Q4"),
+           sex = ifelse(type == "Hops (dry)", "Female", "Male"),
+           # month_current = month_current / 100000
+           ) %>%
+    group_by(sex, quarter) %>% 
+    summarise(value = sum(month_current, na.rm = TRUE)) %>% 
+    ungroup() %>% 
+    ggplot(aes(quarter, value, fill = fct_rev(sex))) +
+    geom_blank(aes(y = value * 1.05)) +
+    geom_col() +
+    # facet_wrap(~sex, scale = "free_x", nrow = 1) +
+    scale_y_continuous(expand = c(.01, .01), label = comma) +
+    scale_fill_manual(values = c("Female" = moody_blue, "Male" = trolley_grey_light)) +
+    labs(x = NULL, y = NULL) +
+    si_style_ygrid() +
+    theme(legend.position = "none")
+  
+  
+  ggsave("cp_position_junk_better.svg",
+         path = "Graphics",
+         width = 2.0119, height = 1.75)
+  
+  
+  
+  
+  
+
+# Subtle Annotations ------------------------------------------------------
+
+
+
+  beer_states %>% 
+    filter(type == "Bottles and Cans",
+           state != "total",
+           state == "PA") %>%
+    mutate(min_year = case_when(year == min(year) ~ barrels),
+           max_year = case_when(year == max(year) ~ barrels)) %>% 
+    ggplot(aes(year, barrels)) +
+    geom_line(color = moody_blue, size = .75) +
+    geom_point(size = 2, color = moody_blue, na.rm = TRUE) +
+    si_style_void() +
+    theme(legend.position = "none")
+  
+  
+  ggsave("cp_color_annotate_notideal.svg",
+         path = "Graphics",
+         width = 2.0119, height = 1.75)
+  
+  
+  beer_states %>% 
+    filter(type == "Bottles and Cans",
+           state != "total",
+           state == "PA") %>%
+    mutate(min_year = case_when(year == min(year) ~ barrels,
+                                year %in% c(2014, 2017) ~ barrels),
+           max_year = case_when(year == max(year) ~ barrels)) %>% 
+    ggplot(aes(year, barrels)) +
+    geom_line(color = moody_blue, size = .75) +
+    geom_point(aes(y = min_year), size = 2, color = moody_blue, na.rm = TRUE) +
+    geom_point(aes(y = max_year), size = 2, color = moody_blue, shape = 21, fill = "white", stroke = 1, na.rm = TRUE) +
+    si_style_void() +
+    theme(legend.position = "none")
+    
+  
+  ggsave("cp_color_annotate_better.svg",
+         path = "Graphics",
+         width = 2.0119, height = 1.75)
+  
+  
+  
+
+# APPROVED COLORS ---------------------------------------------------------
+
   set.seed(42)
   df <- crossing(x = c(1:8),
                  y = LETTERS[1:8]) %>% 
@@ -488,19 +676,70 @@ brewing_materials %>%
   df %>% 
     ggplot(aes(x, y, fill = z)) +
     geom_tile(color = "white") +
-    scale_fill_si(discrete = FALSE) +
+    scale_fill_gradientn(colours = rainbow(20)) +
     si_style_void() +
     theme(legend.position = "none")
   
-  ggsave("cp_lines_dual_better.svg", 
+  ggsave("cp_color_approved_notideal.svg", 
          path = "Graphics",
          width = 2.0119, height = 1.75)
   
+  df %>% 
+    ggplot(aes(x, y, fill = z)) +
+    geom_tile(color = "white") +
+    scale_fill_si("old_roses", discrete = FALSE) +
+    si_style_void() +
+    theme(legend.position = "none")
   
+  ggsave("cp_color_approved_better.svg", 
+         path = "Graphics",
+         width = 2.0119, height = 1.75)  
   
+
+
+
+# Intentional -------------------------------------------------------------
+
+
+  set.seed(42)
+  df_scatter <- tibble(x = runif(64),
+                       y = runif(64),
+                       z = runif(64, 1, 3),
+                       c = sample(1:4, 64, replace = TRUE)) %>% 
+    mutate(flag = x > .75 & y < .25)
   
+  df_scatter %>% 
+    ggplot(aes(x, y, size = z, color = c)) +
+    geom_point(alpha = .8) +
+    scale_size(range = c(1, 3)) +
+    labs(x = NULL, y = NULL) +
+    si_style_xyline() +
+    theme(axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = "none")
   
+  ggsave("cp_color_intentional_notideal.svg", 
+         path = "Graphics",
+         width = 2.0119, height = 1.75) 
   
+  df_scatter %>% 
+    ggplot(aes(x, y, size = z, color = flag)) +
+    geom_point(alpha = .6) +
+    scale_color_manual(values = c(trolley_grey_light, scooter)) +
+    scale_size(range = c(1, 3)) +
+    labs(x = NULL, y = NULL) +
+    si_style_xyline() +
+    theme(axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = "none")
+  
+  ggsave("cp_color_intentional_better.svg", 
+         path = "Graphics",
+         width = 2.0119, height = 1.75)
+    
+  
+# EXTRA -------------------------------------------------------------------
+
   
 set.seed(42)
 type_map <- replicate(length(unique(brewing_materials$type)), gen_sitename()) %>%
