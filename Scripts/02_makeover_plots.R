@@ -175,7 +175,7 @@ library(patchwork)
     df_bar_adj %>%
       ggplot(aes(achievement, mod_lab, fill = achv_flag, color = achv_flag)) +
       geom_blank(aes(achievement * 1.2)) +
-      geom_segment(aes(xend = 0, yend = mod_lab), size = 1, color = "gray30") +
+      geom_segment(aes(xend = 0, yend = mod_lab), size = 1) +
       geom_point(shape = 21, stroke = 1.1, size = 6, color = "white") +
       geom_text(aes(label = percent(achievement, 1),
                     family = "Source Sans Pro", size = 3,
@@ -207,7 +207,8 @@ library(patchwork)
 
     df_stack <- cascade %>%
       filter(indicator == "TX_NEW",
-             period_type == "results")
+             period_type == "results",
+             period != "FY50Q1")
 
 
     ptnr_sel <- df_stack %>%

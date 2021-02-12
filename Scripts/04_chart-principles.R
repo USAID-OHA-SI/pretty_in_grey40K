@@ -243,25 +243,64 @@ brewing_materials %>%
   ggsave("cp_lines_dual_notideal.svg", 
          path = "Graphics",
          width = 2.0119, height = 1.75)
+  #mekko
+  # brewer_size %>% 
+  #   filter(year == max(year),
+  #          brewer_size %in% c("30,001 to 60,000 Barrels", 
+  #                             "60,001 to 100,000 Barrels",
+  #                             "100,001 to 500,000 Barrels",
+  #                             "500,001 to 1,000,000 Barrels")) %>%
+  #   mutate(share = n_of_brewers/sum(n_of_brewers)) %>% 
+  #   ggplot(aes(brewer_size, total_barrels, fill = brewer_size, width = n_of_brewers)) +
+  #   geom_col() +
+  #   facet_grid(~brewer_size, scales="free_x", space="free_x") +
+  #   expand_limits(y = 9000000) +
+  #   scale_fill_si(palette = "scooter") +
+  #   si_style_void() +
+  #   theme(legend.position = "none",
+  #         axis.text.x = element_blank(),
+  #         axis.text.y = element_blank(),
+  #         strip.text = element_blank(),
+  #         panel.spacing = unit(.1, "lines"))
   
-  brewer_size %>% 
+  df_dual <- brewer_size %>% 
     filter(year == max(year),
            brewer_size %in% c("30,001 to 60,000 Barrels", 
                               "60,001 to 100,000 Barrels",
                               "100,001 to 500,000 Barrels",
                               "500,001 to 1,000,000 Barrels")) %>%
-    mutate(share = n_of_brewers/sum(n_of_brewers)) %>% 
-    ggplot(aes(brewer_size, total_barrels, fill = brewer_size, width = n_of_brewers)) +
-    geom_col() +
-    facet_grid(~brewer_size, scales="free_x", space="free_x") +
-    expand_limits(y = 9000000) +
+    mutate(share = n_of_brewers/sum(n_of_brewers)) 
+  
+  v_d1 <- df_dual %>% 
+    ggplot(aes(total_barrels, fct_reorder(brewer_size, total_barrels, sum))) +
+    geom_col(aes(fill = brewer_size)) +
+    geom_vline(xintercept = 0, color = "#505050") +
     scale_fill_si(palette = "scooter") +
-    si_style_void() +
+    scale_y_discrete(expand = c(.005, .005)) +
+    labs(x = NULL, y = NULL) +
+    si_style_nolines() +
     theme(legend.position = "none",
           axis.text.x = element_blank(),
-          axis.text.y = element_blank(),
-          strip.text = element_blank(),
-          panel.spacing = unit(.1, "lines"))
+          axis.text.y = element_blank())
+  
+  v_d2 <- df_dual %>% 
+    ggplot(aes(share, fct_reorder(brewer_size, total_barrels, sum), color = brewer_size)) +
+    geom_blank(aes(x = 1.1 * share)) +
+    geom_segment(aes(x = 0, xend = share, 
+                     yend = fct_reorder(brewer_size, total_barrels, sum)), size = .9) +
+    geom_point(size = 2) +
+    geom_vline(xintercept = 0, color = "#505050") +
+    scale_color_si(palette = "scooter") +
+    scale_fill_si(palette = "scooter") +
+    scale_x_discrete(expand = c(.01, .01)) +
+    labs(x = NULL, y = NULL) +
+    si_style_nolines() +
+    theme(legend.position = "none",
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank())
+  
+  v_d1 + v_d2 + 
+    plot_layout(widths = c(2, 1))
   
   ggsave("cp_lines_dual_better.svg", 
          path = "Graphics",
