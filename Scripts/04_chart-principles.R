@@ -2,7 +2,7 @@
 ## AUTHOR:  A.Chafetz & T.Essam | USAID
 ## PURPOSE: viz for chart principles (not ideal-> good plots)
 ## DATE:    2021-01-15
-## UPDATED: 2021-02-11
+## UPDATED: 2021-02-12
 
 
 # DEPENDENCIES ------------------------------------------------------------
@@ -777,6 +777,45 @@ brewing_materials %>%
          width = 2.0119, height = 1.75)
     
   
+  
+
+# Gradient ----------------------------------------------------------------
+
+  partners <- hts_geo %>% 
+    pull(primepartner)
+  
+  partner_vals <- tibble(primepartner = partners,
+         val1 = c(2,2,2,2,2,
+                  2,2,2,2,2,
+                  2,4,12),
+         val2 = runif(13))
+  
+hts_geo %>% 
+  left_join(partner_vals) %>% 
+    ggplot(aes(fill = val1)) +
+    geom_sf(color = "white", size = .2) +
+    scale_fill_si("burnt_siennas", discrete = FALSE) +
+    si_style_void() +
+    theme(panel.grid = element_blank(),
+          legend.position = "none")
+
+ggsave("cp_color_gradient_notideal.svg", 
+       path = "Graphics",
+       width = 2.0119, height = 1.75)
+  
+hts_geo %>% 
+  left_join(partner_vals) %>% 
+  ggplot(aes(fill = val2), color = "white") +
+  geom_sf(color = "white", size = .2) +
+  scale_fill_si("burnt_siennas", discrete = FALSE) +
+  si_style_void() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+ggsave("cp_color_gradient_better.svg", 
+       path = "Graphics",
+       width = 2.0119, height = 1.75)
+    
 # EXTRA -------------------------------------------------------------------
 
   
