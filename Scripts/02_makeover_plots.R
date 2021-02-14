@@ -227,7 +227,7 @@ library(patchwork)
 
     rmk_stack <- df_stack %>%
       ggplot(aes(period, value, fill = partner_fill)) +
-      geom_col() +
+      geom_col(width = .8) +
       geom_hline(yintercept = 0) +
       facet_wrap(~factor(primepartner, ptnr_sel)) +
       scale_y_continuous(label = comma) +
