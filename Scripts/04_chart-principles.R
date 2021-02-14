@@ -2,7 +2,7 @@
 ## AUTHOR:  A.Chafetz & T.Essam | USAID
 ## PURPOSE: viz for chart principles (not ideal-> good plots)
 ## DATE:    2021-01-15
-## UPDATED: 2021-02-12
+## UPDATED: 2021-02-14
 
 
 # DEPENDENCIES ------------------------------------------------------------
@@ -58,40 +58,50 @@ ggsave("cp_text_annotate.svg",
 
 # Consistent typeface and sizing ------------------------------------------
 # 
-# set.seed(seeds[4])
-# df <- tibble(x = runif(10, 25, 50),
-#              y = runif(10, 25, 50),
-#              z = runif(10, 80, 100),
-#              n = 1:10
-#              )
-# 
-# v1 <- df %>%
-#   ggplot(aes(x, y)) +
-#   geom_point(size = 4) +
-#   si_style_void() +
-#   lab(title = "Title")
-# 
-# v2 <- df %>%
-#   filter(n < 6) %>% 
-#   ggplot(aes(z, as.character(n))) +
-#   geom_col() +
-#   si_style_void() +
-#   labs(title = "test")
-# 
-# 
-# df %>% 
-#   filter(n <= 3) %>% 
-#   select(x, y, n) %>%
-#   pivot_longer(c(x, y)) %>% 
-#   group_by(n) %>% 
-#   mutate(row = row_number()) %>% 
-#   ggplot(aes(row, value, group = n)) +
-#   geom_path() +
-#   geom_point() +
-#   scale_x_continuous(expand = c(.05, .05)) +
-#   si_style_void()
+
+beer_states %>% 
+  filter(type == "On Premises",
+         state == "DC",
+         year >= 2010) %>% 
+  ggplot(aes(year, barrels)) +
+  geom_path(color = genoa) +
+  expand_limits(y = 0) +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(breaks = seq(2010,2019, 2)) + 
+  labs(y = 'TOTAL INDEX TESTS', x = NULL,
+       title = "Recent Scale up of Index Testing",
+       subtitle = "Jupiter") +
+  theme_light() +
+  theme(plot.title = element_text("Comic Sans MS"),
+        plot.subtitle = element_text("Franklin Gothic Demi Cond"),
+        axis.title.y = element_text("Times New Roman"),
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        axis.ticks = element_blank()
+        )
+
+ggsave("cp_text_typeface_notideal.svg", 
+       path = "Graphics",
+       width = 2.0119, height = 1.75)
+
+beer_states %>% 
+  filter(type == "On Premises",
+         state == "DC",
+         year >= 2010) %>% 
+  ggplot(aes(year, barrels)) +
+  geom_path(color = genoa) +
+  expand_limits(y = 0) +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(breaks = seq(2010,2019, 2)) + 
+  labs(y = NULL, x = NULL,
+       title = "Recent Scale up of Index Testing",
+       subtitle = "Jupiter | Total Index Tests") +
+  si_style_nolines()
 
 
+ggsave("cp_text_typeface_better.svg", 
+       path = "Graphics",
+       width = 2.0119, height = 1.75)
 
 # INTEGRATED LEGEND -------------------------------------------------------
 
