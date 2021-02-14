@@ -2,7 +2,7 @@
 ## AUTHOR:  A.Chafetz & T.Essam | USAID
 ## PURPOSE: makeover plots for style guide
 ## DATE:    2020-10-25
-## UPDATED: 2020-10-29
+## UPDATED: 2020-02-14
 
 
 # DEPENDENCIES ------------------------------------------------------------
@@ -127,77 +127,69 @@ library(patchwork)
            period_type == "targets") %>%
     count(primepartner, wt = value, sort = TRUE)
 
-   df_bar <- hts %>%
-      filter(indicator == "HTS_TST_POS",
-             period == "FY49",
-             primepartner == "Auriga") %>%
-     pivot_wider(names_from = period_type) %>%
-     mutate(achievement = cumulative/targets,
-            achievement_adj = ifelse(achievement > 1, .94, achievement),
-            targets = ifelse(is.na(targets), 0, targets),
-            cumulative = ifelse(is.na(cumulative), 0, cumulative),
-            )
-
-    df_bar %>%
-      ggplot(aes(modality, cumulative)) +
-      geom_col(fill = pal_excel[1], na.rm = TRUE) +
-      geom_point(aes(y = achievement_adj*1500), shape = 23, fill = pal_excel[6], size = 3,
-                 na.rm = TRUE) +
-      scale_fill_manual(values = rep(pal_excel, 3)) +
-      scale_y_continuous(expand = c(.005, .005), name = "Cumulative",
-                         sec.axis = sec_axis(~./1500, name = "Achievement", labels = percent)) +
-      labs(x = NULL, title = "Auriga HTS_TST_POS") +
-      excel_style() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-    # ggsave("Images/bar_default.png", dpi = 300, height = 4.71, width = 7.31)
-    ggsave("Images/bar_default.svg", dpi = 300, height = 4.82, width = 4.9306)
-
-
-
-    df_bar_adj <- df_bar %>%
-      mutate(modality = fct_lump(modality, 5, w = targets, other_level = "All Other")) %>%
-      filter(targets > 0) %>%
-      group_by(period, modality) %>%
-      summarise(across(c(targets, cumulative), sum, na.rm = TRUE)) %>%
-      ungroup() %>%
-      mutate(achievement = cumulative / targets,
-             achv_flag = achievement < .9,
-             modality = recode(modality,
-                               "OtherPITC" = "Other PITC",
-                               "TBClinic" = "TB Clinic"),
-             mod_lab = glue("{modality}\n[{comma(cumulative, 1)}/{comma(targets, 1)}]") %>%
-               fct_reorder(cumulative) %>%
-               fct_relevel("All Other\n[890/630]", after = 0)
-             )
-
-    df_bar_adj %>%
-      ggplot(aes(achievement, mod_lab, fill = achv_flag, color = achv_flag)) +
-      geom_blank(aes(achievement * 1.2)) +
-      geom_segment(aes(xend = 0, yend = mod_lab), size = 1) +
-      geom_point(shape = 21, stroke = 1.1, size = 6, color = "white") +
-      geom_text(aes(label = percent(achievement, 1),
-                    family = "Source Sans Pro", size = 3,
-                    hjust = -.4)) +
-      scale_x_continuous(expand = c(.005, .005), labels = percent,
-                         breaks = seq(0, 2.5, .5)) +
-      scale_fill_manual(values = c("gray30", "#c43d4d")) +
-      scale_color_manual(values = c("gray30", "#c43d4d")) +
-      labs(x = NULL, y = NULL,
-           title = "SPECIAL ATTENTION SHOULD BE PAID TO <br>AURIGA'S <span style = 'color:#c43d4d;'>OTHER PITC</span> AND <span style = 'color:#c43d4d;'>PMTCT</span><br>ENTRY POINTS",
-           subtitle = "HTS_TST_POS Achievement,\nsorted by cumulative results",
-           caption =  glue("Source: {max(hts$period)} MSD")) +
-      si_style_xgrid() +
-      theme(legend.position = "none",
-            plot.title = element_markdown(),
-            axis.text.x = element_blank())
-
-
-    # ggsave("Images/bar_makeover.png", dpi = 300, height = 4.71, width = 7.31)
-    ggsave("Images/bar_makeover.svg", dpi = 300, height = 4.82, width = 4.9306)
-
-
+  df_dual <- cascade %>% 
+    filter(indicator %in% c("HTS_TST", "HTS_TST_POS"),
+           primepartner == "Auriga",
+           period_type == "results") %>% 
+    pivot_wider(names_from = indicator) %>% 
+    mutate(positivity = HTS_TST_POS / HTS_TST,
+           focus = period %in% c("FY49Q2", "FY49Q3", "FY49Q4", "FY50Q1"),
+           focus_pos = case_when(focus == TRUE ~ positivity)) %>% 
+    arrange(period)
+  
+  
+  df_dual %>%
+    ggplot(aes(period, HTS_TST)) +
+    geom_col(fill = pal_excel[1], na.rm = TRUE) +
+    geom_point(aes(y = positivity*800000), shape = 23, fill = pal_excel[6], size = 3,
+               na.rm = TRUE) +
+    scale_fill_manual(values = rep(pal_excel, 3)) +
+    scale_y_continuous(expand = c(.005, .005), name = "Quarterly Results",
+                       sec.axis = sec_axis(~./800000, name = "Positivity", labels = percent)) +
+    expand_limits(y = 1000) +
+    labs(x = NULL, title = "Auriga HTS_TST and Positivity") +
+    excel_style() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  ggsave("Images/bar_default.svg", dpi = 300, height = 4.82, width = 4.9306)
+  
+  (v_bar <- df_dual %>% 
+      ggplot(aes(period, HTS_TST, fill = focus)) +
+      geom_col() +
+      scale_y_continuous(expand = c(.005, .005), labels = comma) +
+      scale_x_discrete(breaks = c("FY48Q1", "FY48Q3", "FY49Q1", "FY49Q3", "FY51Q1"))+
+      scale_fill_manual(values = c(moody_blue_light, moody_blue)) +
+      labs(x = NULL, y = NULL) +
+      si_style_ygrid() +
+      theme(legend.position = "none")
+  )
+  
+  (v_line <- df_dual %>% 
+      ggplot(aes(period, positivity, group = primepartner)) +
+      geom_point(aes(color = focus)) +
+      geom_path(aes(color = focus)) +
+      scale_color_manual(values = c(trolley_grey, moody_blue)) +
+      scale_y_continuous(expand = c(.005, .005), label = percent_format(1)) +
+      labs(x = NULL, y = NULL) +
+      si_style_xline() +
+      theme(axis.text.x = element_blank(),
+            axis.text.y = element_blank())
+  )
+  
+  v_line / v_bar +
+    plot_layout(heights = c(1, 3)) +
+    plot_annotation(
+      title = "AURIGA OPTIMIZING TESTING TO DECREASE TOTAL TESTS<br>WHILE INCREASING POSITIVITY IN <span style = 'color:#8980cb;'>LAST 4 QUARTERS</span>",
+      subtitle = 'Positivity and Total Tests in Saturn',
+      caption = 'Source: FY50Q1 MSD'
+    ) & 
+    si_style_ygrid() & 
+    theme(plot.title = element_markdown(),
+          legend.position = "none")
+  
+  ggsave("Images/bar_makeover.svg", dpi = 300, height = 4.82, width = 4.9306)
+  
+  
 
 # STACKED BAR -------------------------------------------------------------
 
