@@ -2,7 +2,7 @@
 ## AUTHOR:  A.Chafetz & T.Essam | USAID
 ## PURPOSE: viz for chart principles (not ideal-> good plots)
 ## DATE:    2021-01-15
-## UPDATED: 2021-02-14
+## UPDATED: 2021-02-17
 
 
 # DEPENDENCIES ------------------------------------------------------------
@@ -573,8 +573,8 @@ brewing_materials %>%
   
   pie %>% 
     ggplot(aes(total_barrels, brewer_size, fill = brewer_size)) +
-    geom_col(fill = trolley_grey) +
-    geom_col(data = filter(pie, max(total_barrels) == total_barrels), fill = denim) +
+    geom_col(fill = trolley_grey, width = .8) +
+    geom_col(data = filter(pie, max(total_barrels) == total_barrels), fill = denim, width = .8) +
     si_style_void() +
     theme(legend.position = "none")
     
