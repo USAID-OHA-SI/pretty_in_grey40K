@@ -67,5 +67,5 @@ tbl <- tbl %>%
 
 gtsave(tbl, file.path(images,"Style_guide_table_remake.png"))
   
-
+library(janitor)
 
