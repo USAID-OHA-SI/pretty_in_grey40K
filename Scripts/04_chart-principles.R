@@ -795,19 +795,20 @@ brewing_materials %>%
 # Gradient ----------------------------------------------------------------
 
   partners <- hts_geo %>% 
-    pull(primepartner)
+    pull(prime_partner_name)
   
-  partner_vals <- tibble(primepartner = partners,
+  partner_vals <- tibble(#prime_partner_name = partners,
          val1 = c(2,2,2,2,2,
                   2,2,2,2,2,
                   2,4,12),
          val2 = runif(13))
   
 hts_geo %>% 
-  left_join(partner_vals) %>% 
+  bind_cols(partner_vals) %>% 
     ggplot(aes(fill = val1)) +
     geom_sf(color = "white", size = .2) +
-    scale_fill_si("burnt_siennas", discrete = FALSE) +
+    # scale_fill_si("burnt_siennas", discrete = FALSE) +
+    scale_fill_gradientn(colors = colorRampPalette(c("#ffbb79", "#ff9959", "#fa7538", "#e7591c", "#cc4307", "#b22b01", "#990c00", "#780000", "#560000"))(256)) + 
     si_style_void() +
     theme(panel.grid = element_blank(),
           legend.position = "none")
@@ -817,10 +818,11 @@ ggsave("cp_color_gradient_notideal.svg",
        width = 2.0119, height = 1.75)
   
 hts_geo %>% 
-  left_join(partner_vals) %>% 
+  bind_cols(partner_vals) %>% 
   ggplot(aes(fill = val2), color = "white") +
   geom_sf(color = "white", size = .2) +
-  scale_fill_si("burnt_siennas", discrete = FALSE) +
+  # scale_fill_si("burnt_siennas", discrete = FALSE) +
+  scale_fill_gradientn(colors = colorRampPalette(c("#ffbb79", "#ff9959", "#fa7538", "#e7591c", "#cc4307", "#b22b01", "#990c00", "#780000", "#560000"))(256)) + 
   si_style_void() +
   theme(panel.grid = element_blank(),
         legend.position = "none")
