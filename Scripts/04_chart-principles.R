@@ -563,7 +563,7 @@ brewing_materials %>%
     mutate(brewer_size = fct_reorder(brewer_size, total_barrels))
   
   pie3D(pie$total_barrels, radius = 1.5,
-        col = si_palettes$siei_pairs)
+        col = c(si_palettes$hemsworth, "#909090"))
   
   
   # ggsave("cp_position_3d_notideal.svg", 
