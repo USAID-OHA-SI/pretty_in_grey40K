@@ -736,7 +736,10 @@ brewing_materials %>%
   df %>% 
     ggplot(aes(x, y, fill = z)) +
     geom_tile(color = "white") +
-    scale_fill_si("old_roses", discrete = FALSE) +
+    # scale_fill_si("old_roses", discrete = FALSE) +
+    # scale_fill_gradient(low = "white",
+    #                     high = hw_midnight_blue) +
+    scale_fill_gradientn(colors = colorRampPalette(c('#002a02', '#00421d', '#015c34', '#23764b', '#409063', '#5bab7c', '#76c797', '#92e3b1', '#b4ffd3'))(256)) + 
     si_style_void() +
     theme(legend.position = "none")
   
