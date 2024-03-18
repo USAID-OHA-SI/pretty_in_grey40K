@@ -2,8 +2,8 @@
 library(tidyverse)
 library(gt)
 library(glitr)
-library(extrafont)
-library(extrafontdb)
+library(systemfonts)
+library(systemfontsdb)
 
 images <- "Images"
 

@@ -10,7 +10,7 @@
   library(tidyverse)
   library(glitr)
   library(here)
-  library(extrafont)
+  library(systemfonts)
   
   # Where stuff gonna live
   graph <- "Graphics"
