@@ -3,7 +3,7 @@
 ## PURPOSE: anatomy of a plot
 ## REF ID:   8b8b72ce 
 ## DATE:    2020-11-03
-## UPDATED: 2024-03-18
+## UPDATED: 2024-05-02
 
 
 # DEPENDENCIES ------------------------------------------------------------
@@ -49,7 +49,8 @@ df_index %>%
   si_style_ygrid() +
   theme(plot.subtitle = element_markdown())
 
-
+  
+  
 # EXPORT ------------------------------------------------------------------
 
 #create outputfolder if not created already
@@ -62,3 +63,46 @@ df_index %>%
 #save
   si_save("Graphics/anatomy_plot.svg", height = p_h, width = p_w)
 
+
+# PLOT 2  -----------------------------------------------------------------
+  
+  df_facet <- hts %>% 
+    filter(indicator == "HTS_TST_POS",
+           modality %in% c("Index", "OtherPITC"),
+           prime_partner_name %in% c("Corvus", "Capricornus"),
+           period_type == "results") %>% 
+    mutate(prime_partner_name = case_match(prime_partner_name,
+                                           "Corvus" ~ "Small Multiples Title 2",
+                                           "Capricornus" ~ "Small Multiples Title 1"),
+           modality = case_match(modality,
+                                 "Index" ~ "Item 1", 
+                                 "OtherPITC" ~ "Item 2")) %>% 
+    count(operatingunit, prime_partner_name, indicator, modality, period, wt = value, name = "results") 
+  
+  
+  df_facet %>% 
+    ggplot(aes(period, results, color = modality, group = modality)) +
+    geom_blank(aes(y = results * 1.1)) +
+    # geom_col() +
+    geom_line(linewidth = 1.2) +
+    facet_wrap(~prime_partner_name) +
+    scale_x_discrete(labels = rep("Label", 5)) +
+    scale_y_continuous(labels =  rep("Label", 4),
+                       expand = c(.005, .005),
+                       breaks = seq(0, 900, by = 300)
+    ) +
+    expand_limits(y = 0) +
+    # scale_fill_identity() +
+    labs(x = "Axis Title (typically incorporated into title or subtitle)", 
+         y = NULL, color = NULL,
+         caption = "Source/Notes",
+         title = "Informative Title" %>% toupper,
+         subtitle = "Subtitle sentence, tends to include legend"
+    ) +
+    scale_color_manual(values = c(hw_electric_indigo, hw_orchid_bloom)) +
+    si_style_ygrid() +
+    theme(plot.subtitle = element_markdown())
+  
+  #save
+  si_save("Graphics/anatomy_plot2.svg", height = p_h, width = p_w)
+  
