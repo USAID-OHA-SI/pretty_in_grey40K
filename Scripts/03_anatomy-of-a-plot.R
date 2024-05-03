@@ -31,6 +31,20 @@ df_index <- hts %>%
   count(operatingunit, indicator, period, wt = value, name = "results") %>% 
   mutate(fill_col = ifelse(period == "FY50Q1", decline_fill, main_fill))
   
+df_facet <- hts %>% 
+  filter(indicator == "HTS_TST_POS",
+         modality %in% c("Index", "OtherPITC"),
+         prime_partner_name %in% c("Corvus", "Capricornus"),
+         period_type == "results") %>% 
+  mutate(prime_partner_name = case_match(prime_partner_name,
+                                         "Corvus" ~ "Small Multiples Title 2",
+                                         "Capricornus" ~ "Small Multiples Title 1"),
+         modality = case_match(modality,
+                               "Index" ~ "Item 1", 
+                               "OtherPITC" ~ "Item 2")) %>% 
+  count(operatingunit, prime_partner_name, indicator, modality, period, wt = value, name = "results") 
+  
+  
 # PLOT --------------------------------------------------------------------
 
 df_index %>% 
@@ -66,20 +80,6 @@ df_index %>%
 
 # PLOT 2  -----------------------------------------------------------------
   
-  df_facet <- hts %>% 
-    filter(indicator == "HTS_TST_POS",
-           modality %in% c("Index", "OtherPITC"),
-           prime_partner_name %in% c("Corvus", "Capricornus"),
-           period_type == "results") %>% 
-    mutate(prime_partner_name = case_match(prime_partner_name,
-                                           "Corvus" ~ "Small Multiples Title 2",
-                                           "Capricornus" ~ "Small Multiples Title 1"),
-           modality = case_match(modality,
-                                 "Index" ~ "Item 1", 
-                                 "OtherPITC" ~ "Item 2")) %>% 
-    count(operatingunit, prime_partner_name, indicator, modality, period, wt = value, name = "results") 
-  
-  
   df_facet %>% 
     ggplot(aes(period, results, color = modality, group = modality)) +
     geom_blank(aes(y = results * 1.1)) +
@@ -99,10 +99,11 @@ df_index %>%
          title = "Informative Title" %>% toupper,
          subtitle = "Subtitle sentence, tends to include legend"
     ) +
-    scale_color_manual(values = c(hw_electric_indigo, hw_orchid_bloom)) +
+    scale_color_manual(values = c(hw_electric_indigo, hw_hunter)) +
     si_style_ygrid() +
     theme(plot.subtitle = element_markdown())
   
+  
   #save
-  si_save("Graphics/anatomy_plot2.svg", height = p_h, width = p_w)
+  si_save("Graphics/anatomy_plot2.svg",height = 4.3, width = p_w)
   
