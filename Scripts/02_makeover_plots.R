@@ -9,7 +9,7 @@
 # DEPENDENCIES ------------------------------------------------------------
 
 library(tidyverse)
-library(scales)
+library(scales, warn.conflicts = FALSE)
 library(glitr)
 library(themask)
 library(ggrepel)
